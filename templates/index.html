@@ -701,7 +701,55 @@
                                 <option value="major">Major Acquisition ($7.5M+)</option>
                             </select>
                         </div>
+                        <div class="input-group">
+                            <label class="input-label">Contract Value Range</label>
+                            <select class="input-field select-field" id="contractValue">
+                                <option value="micro">Micro Purchase ($0 - $10K)</option>
+                                <option value="small">Small Purchase ($10K - $250K)</option>
+                                <option value="simplified">Simplified Acquisition ($250K - $7.5M)</option>
+                                <option value="major">Major Acquisition ($7.5M+)</option>
+                            </select>
+                        </div>
 
+                        <div class="input-group">
+                            <label class="input-label">Proposal Due Date</label>
+                            <input type="date" class="input-field" id="proposalDueDate">
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Contract Duration</label>
+                            <select class="input-field select-field" id="contractDuration">
+                                <option value="3">3 months</option>
+                                <option value="6">6 months</option>
+                                <option value="12" selected>12 months</option>
+                                <option value="24">24 months</option>
+                                <option value="36">36 months</option>
+                                <option value="60">60 months</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Place of Performance</label>
+                            <select class="input-field select-field" id="placeOfPerformance">
+                                <option value="contractor">Contractor's Facility</option>
+                                <option value="pentagon">Pentagon, Arlington, VA</option>
+                                <option value="wpafb">Wright-Patterson AFB, OH</option>
+                                <option value="redstone">Redstone Arsenal, AL</option>
+                                <option value="norfolk">Norfolk Naval Base, VA</option>
+                                <option value="quantico">Quantico, VA</option>
+                                <option value="fort-belvoir">Fort Belvoir, VA</option>
+                                <option value="multiple">Multiple Government Locations</option>
+                                <option value="conus">CONUS (Continental US)</option>
+                                <option value="worldwide">Worldwide</option>
+                                <option value="custom">Custom Location</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group" id="customLocationGroup" style="display: none;">
+                            <label class="input-label">Custom Location</label>
+                            <input type="text" class="input-field" id="customLocation" placeholder="Enter specific location">
+                        </div>
+                        
                         <div class="compliance-panel">
                             <div class="compliance-title">Required Compliance Standards</div>
                             <div class="compliance-item">
