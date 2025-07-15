@@ -306,12 +306,6 @@ def generate_rfp_content(data):
     
     return content
 
-@app.route('/api/templates', methods=['GET'])
-@login_required
-def get_templates():
-    """Get available RFP templates"""
-    return jsonify({'templates': templates})
-
 @app.route('/api/templates/<template_id>', methods=['GET'])
 @login_required
 def get_template(template_id):
