@@ -85,8 +85,9 @@ def initialize_templates():
     for template_id, template_data in default_templates.items():
         templates[template_id] = template_data
 
-# Authentication decorator
+# Authentication decorator - FIXED to preserve function names
 def login_required(f):
+    @wraps(f)  # This preserves the original function name and metadata
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
             return redirect(url_for('login'))
