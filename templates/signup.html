@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - GovRFP AI</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #111827;
+            --bg-medium: #1F2937;
+            --bg-light: #374151;
+            --border-color: #4B5563;
+            --text-primary: #F9FAFB;
+            --text-secondary: #D1D5DB;
+            --text-muted: #9CA3AF;
+            --accent-blue: #3B82F6;
+            --accent-red: #EF4444;
+            --accent-green: #10B981;
+            --accent-gold: #F59E0B;
+            --font-primary: 'Roboto', sans-serif;
+            --font-display: 'Orbitron', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .signup-container {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .signup-logo {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .signup-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .signup-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .signup-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--accent-red);
+        }
+
+        .form-input.success {
+            border-color: var(--accent-green);
+        }
+
+        .error-message {
+            color: var(--accent-red);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--accent-green);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #60A5FA;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .security-notice {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .security-notice .notice-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .approved-domains {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .approved-domains strong {
+            color: var(--text-secondary);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            background: rgba(31, 41, 55, 0.95);
+            padding: 0 16px;
+        }
+
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .back-link a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .back-link a:hover {
+            color: var(--text-secondary);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .login-link a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .requirements-list {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .requirements-list li {
+            margin-bottom: 4px;
+        }
+
+        .strength-indicator {
+            height: 4px;
+            background: var(--bg-light);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: var(--accent-red); width: 25%; }
+        .strength-fair { background: var(--accent-gold); width: 50%; }
+        .strength-good { background: var(--accent-blue); width: 75%; }
+        .strength-strong { background: var(--accent-green); width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <div class="signup-logo">🛡️ GovRFP AI</div>
+            <div class="signup-subtitle">Department of Defense Contracting Platform</div>
+            <h1 class="signup-title">Create Your Account</h1>
+            <p class="signup-description">Join defense contractors and government agencies using AI-powered RFP generation.</p>
+        </div>
+
+        <div class="security-notice">
+            <div class="notice-title">
+                🔒 Security Notice
+            </div>
+            <p>Account creation is restricted to authorized government personnel and approved defense contractors only.</p>
+            <div class="approved-domains">
+                <strong>Approved Domains:</strong> .gov, .mil, .navy.mil, .army.mil, .af.mil, .uscg.mil, authorized contractors
+            </div>
+        </div>
+
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" id="fullName" name="fullName" class="form-input" 
+                       placeholder="John Smith" required>
+                <div class="error-message" id="nameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Government/Contractor Email</label>
+                <input type="email" id="email" name="email" class="form-input" 
+                       placeholder="user@agency.gov" required>
+                <div class="error-message" id="emailError"></div>
+                <div class="success-message" id="emailSuccess"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="organization" class="form-label">Organization/Agency</label>
+                <input type="text" id="organization" name="organization" class="form-input" 
+                       placeholder="Department of Defense" required>
+                <div class="error-message" id="orgError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="role" class="form-label">Job Title/Role</label>
+                <input type="text" id="role" name="role" class="form-input" 
+                       placeholder="Contracting Officer" required>
+                <div class="error-message" id="roleError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-input" 
+                       placeholder="Create a secure password" required>
+                <div class="strength-indicator">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <div class="error-message" id="passwordError"></div>
+                <ul class="requirements-list">
+                    <li>At least 12 characters long</li>
+                    <li>Contains uppercase and lowercase letters</li>
+                    <li>Contains numbers and special characters</li>
+                    <li>No common passwords or dictionary words</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" 
+                       placeholder="Confirm your password" required>
+                <div class="error-message" id="confirmError"></div>
+                <div class="success-message" id="confirmSuccess"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="signupBtn">
+                <span id="signupText">🚀 Create Account</span>
+                <div class="loading" id="loadingSpinner"></div>
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <button type="button" class="btn btn-secondary" onclick="goToCAC()">
+            🏛️ Sign Up with CAC/PIV
+        </button>
+
+        <button type="button" class="btn btn-secondary" onclick="goToDemo()">
+            🚀 Try Demo Mode
+        </button>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="/login">Sign in here</a></p>
+        </div>
+
+        <div class="back-link">
+            <a href="/">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const approvedDomains = [
+            '.gov', '.mil', '.navy.mil', '.army.mil', '.af.mil', '.uscg.mil',
+            '.dod.gov', '.defense.gov', '.pentagon.mil'
+        ];
+
+        const ownerEmail = 'peterbutler41@gmail.com';
+
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                organization: document.getElementById('organization').value.trim(),
+                role: document.getElementById('role').value.trim(),
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value
+            };
+            
+            const signupBtn = document.getElementById('signupBtn');
+            const signupText = document.getElementById('signupText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            // Clear previous errors
+            clearErrors();
+            
+            // Validate all fields
+            if (!validateForm(formData)) {
+                return;
+            }
+            
+            // Show loading state
+            signupBtn.disabled = true;
+            signupText.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+            
+            // Simulate account creation process
+            setTimeout(() => {
+                createAccount(formData);
+            }, 2000);
+        });
+
+        // Real-time password strength checking
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthFill = document.getElementById('strengthFill');
+            const strength = calculatePasswordStrength(password);
+            
+            strengthFill.className = 'strength-fill';
+            if (strength >= 80) {
+                strengthFill.classList.add('strength-strong');
+            } else if (strength >= 60) {
+                strengthFill.classList.add('strength-good');
+            } else if (strength >= 40) {
+                strengthFill.classList.add('strength-fair');
+            } else if (strength > 0) {
+                strengthFill.classList.add('strength-weak');
+            }
+        });
+
+        // Real-time password confirmation checking
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password === confirmPassword) {
+                this.classList.remove('error');
+                this.classList.add('success');
+                showSuccess('confirmSuccess', 'Passwords match');
+            } else if (confirmPassword) {
+                this.classList.remove('success');
+                this.classList.add('error');
+                showError('confirmError', 'Passwords do not match');
+            }
+        });
+
+        function validateForm(data) {
+            let isValid = true;
+
+            // Validate name
+            if (data.fullName.length < 2) {
+                showError('nameError', 'Please enter your full name');
+                isValid = false;
+            }
+
+            // Validate email
+            if (!isValidEmail(data.email)) {
+                showError('emailError', 'Please enter a valid email address');
+                isValid = false;
+            } else if (!isApprovedDomain(data.email)) {
+                showError('emailError', 'This email domain is not authorized. Only .gov, .mil, and approved contractor domains are allowed.');
+                isValid = false;
+            }
+
+            // Validate organization
+            if (data.organization.length < 2) {
+                showError('orgError', 'Please enter your organization or agency');
+                isValid = false;
+            }
+
+            // Validate role
+            if (data.role.length < 2) {
+                showError('roleError', 'Please enter your job title or role');
+                isValid = false;
+            }
+
+            // Validate password
+            const passwordStrength = calculatePasswordStrength(data.password);
+            if (passwordStrength < 60) {
+                showError('passwordError', 'Password does not meet security requirements');
+                isValid = false;
+            }
+
+            // Validate password confirmation
+            if (data.password !== data.confirmPassword) {
+                showError('confirmError', 'Passwords do not match');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function calculatePasswordStrength(password) {
+            let score = 0;
+            
+            if (password.length >= 12) score += 25;
+            if (password.length >= 16) score += 10;
+            if (/[a-z]/.test(password)) score += 15;
+            if (/[A-Z]/.test(password)) score += 15;
+            if (/[0-9]/.test(password)) score += 15;
+            if (/[^A-Za-z0-9]/.test(password)) score += 20;
+            
+            return Math.min(score, 100);
+        }
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function isApprovedDomain(email) {
+            // Always allow owner email
+            if (email === ownerEmail) return true;
+            
+            const domain = email.substring(email.lastIndexOf('@'));
+            return approvedDomains.some(approvedDomain => 
+                domain.endsWith(approvedDomain)
+            );
+        }
+        
+        function createAccount(data) {
+            // In a real system, this would make an API call to create the account
+            // For now, we'll simulate successful account creation
+            
+            const userData = {
+                email: data.email,
+                name: data.fullName,
+                organization: data.organization,
+                role: data.role,
+                authMethod: 'signup',
+                signupTime: new Date().toISOString()
+            };
+            
+            // Store in localStorage for the main app to access
+            localStorage.setItem('govRfpUser', JSON.stringify(userData));
+            
+            // Show success and redirect
+            alert('Account created successfully! Welcome to GovRFP AI.');
+            window.location.href = '/app';
+        }
+        
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            const inputElement = document.querySelector(`[name="${elementId.replace('Error', '')}"]`);
+            
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            
+            if (inputElement) {
+                inputElement.classList.add('error');
+                inputElement.classList.remove('success');
+            }
+        }
+        
+        function showSuccess(elementId, message) {
+            const successElement = document.getElementById(elementId);
+            if (successElement) {
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+            }
+        }
+        
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            const successElements = document.querySelectorAll('.success-message');
+            const inputElements = document.querySelectorAll('.form-input');
+            
+            errorElements.forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+            
+            successElements.forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+            
+            inputElements.forEach(el => {
+                el.classList.remove('error', 'success');
+            });
+        }
+        
+        function goToCAC() {
+            window.location.href = '/auth/cac';
+        }
+        
+        function goToDemo() {
+            const demoUser = {
+                email: 'demo@defense.gov',
+                name: 'Demo User',
+                organization: 'Demo Organization',
+                role: 'demo',
+                authMethod: 'demo',
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('govRfpUser', JSON.stringify(demoUser));
+            window.location.href = '/app';
+        }
+    </script>
+</body>
+</html>
