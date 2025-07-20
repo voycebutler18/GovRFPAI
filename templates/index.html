@@ -466,10 +466,105 @@
                             <div class="feature-card" onclick="loadTemplate('research')"><div class="feature-icon">🔬</div><h3>Research & Development</h3><p>Template for R&D and innovation projects</p></div>
                          </div>
                     </div>
-                    <div id="complianceSection" class="section hidden"><div class="section-title">Compliance Checker</div></div>
-                    <div id="historySection" class="section hidden"><div class="section-title">Document History</div></div>
-                    <div id="securitySection" class="section hidden"><div class="section-title">Security Status</div></div>
-                    <div id="auditSection" class="section hidden"><div class="section-title">Audit Trail</div></div>
+                    
+                    <div id="complianceSection" class="section hidden">
+                        <div class="section-title">Compliance Checker</div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3>Document Compliance Scan</h3>
+                            <p>Upload or paste RFP content to check compliance against regulations</p>
+                            <textarea class="input-field textarea-field" id="complianceInput" placeholder="Paste RFP content here for compliance analysis..."></textarea>
+                            <button class="btn btn-primary" onclick="runComplianceCheck()" style="margin-top: 12px;">🔍 Run Compliance Check</button>
+                        </div>
+                        <div id="complianceResults" class="compliance-panel" style="display: none;">
+                            <div class="compliance-title">Compliance Results</div>
+                            <div id="complianceResultsContent"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="historySection" class="section hidden">
+                        <div class="section-title">Document History</div>
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">📄</div>
+                                <h3>Recent Documents</h3>
+                                <div id="recentDocuments">
+                                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+                                        <strong>Next-Generation UAV Communication System</strong><br>
+                                        <span style="color: var(--text-muted); font-size: 13px;">Modified: 2 hours ago | Status: Draft</span>
+                                    </div>
+                                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+                                        <strong>Advanced Cybersecurity Platform</strong><br>
+                                        <span style="color: var(--text-muted); font-size: 13px;">Modified: 1 day ago | Status: Under Review</span>
+                                    </div>
+                                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+                                        <strong>Medical Device Development Platform</strong><br>
+                                        <span style="color: var(--text-muted); font-size: 13px;">Modified: 3 days ago | Status: Approved</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🔄</div>
+                                <h3>Version Control</h3>
+                                <p>Track changes, approvals, and document evolution</p>
+                                <button class="btn btn-secondary" onclick="showVersionHistory()">View Version History</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="securitySection" class="section hidden">
+                        <div class="section-title">Security Status</div>
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">🛡️</div>
+                                <h3>System Security</h3>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>ATO (Authority to Operate) - Valid</span></div>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>FISMA Moderate Baseline</span></div>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>Continuous Monitoring Active</span></div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🔐</div>
+                                <h3>Access Control</h3>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>Multi-Factor Authentication</span></div>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>Role-Based Access Control</span></div>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>Session Management</span></div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">📊</div>
+                                <h3>Compliance Monitoring</h3>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>NIST 800-171 Controls</span></div>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>CMMC Level 3 Certified</span></div>
+                                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>DFARS 252.204-7012</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="auditSection" class="section hidden">
+                        <div class="section-title">Audit Trail</div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📋</div>
+                            <h3>Recent Activity Log</h3>
+                            <div id="auditLog">
+                                <div style="padding: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+                                    <strong>RFP Generated:</strong> Next-Generation UAV Communication System<br>
+                                    <span style="color: var(--text-muted); font-size: 13px;">User: john.smith@defense.gov | Time: 2 hours ago | IP: 192.168.1.100</span>
+                                </div>
+                                <div style="padding: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+                                    <strong>Template Loaded:</strong> Advanced Cybersecurity Platform<br>
+                                    <span style="color: var(--text-muted); font-size: 13px;">User: jane.doe@army.mil | Time: 4 hours ago | IP: 10.0.0.50</span>
+                                </div>
+                                <div style="padding: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+                                    <strong>Compliance Check:</strong> Medical Device RFP<br>
+                                    <span style="color: var(--text-muted); font-size: 13px;">User: demo@defense.gov | Time: 1 day ago | IP: 172.16.0.25</span>
+                                </div>
+                                <div style="padding: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+                                    <strong>User Login:</strong> CAC Authentication<br>
+                                    <span style="color: var(--text-muted); font-size: 13px;">User: john.smith@defense.gov | Time: 2 days ago | IP: 192.168.1.100</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="exportAuditLog()" style="margin-top: 16px;">📄 Export Audit Log</button>
+                        </div>
+                    </div>
                 </div>
 
                 <aside class="chat-sidebar">
@@ -487,6 +582,7 @@
                     <div class="status-badge secure">🔒 Secure Connection</div>
                     <div class="status-badge draft">📝 Draft Mode</div>
                     <span>User: <span id="currentUserEmail"></span></span>
+                    <button class="btn btn-secondary" onclick="exitDemoMode()" id="exitDemoBtn" style="display: none; padding: 6px 12px; font-size: 12px;">🚪 Exit Demo</button>
                 </div>
                 <div>Last saved: <span id="lastSaved">Never</span></div>
             </footer>
@@ -538,6 +634,7 @@
         currentUser = { name: 'Demo User', email: 'demo@defense.gov' };
         document.getElementById('currentUserEmail').textContent = currentUser.email;
         document.getElementById('authOverlay').style.display = 'none';
+        document.getElementById('exitDemoBtn').style.display = 'inline-flex';
         showNotification('Demo mode activated', 'success');
         initializePage();
     }
@@ -657,6 +754,58 @@
         document.getElementById('missionObjective').value = '';
         document.getElementById('rfpPreview').classList.add('hidden');
         showNotification('Form cleared', 'info');
+    }
+
+    // Compliance functions
+    function runComplianceCheck() {
+        const content = document.getElementById('complianceInput').value.trim();
+        if (!content) {
+            showNotification('Please enter RFP content to check compliance', 'error');
+            return;
+        }
+        
+        showNotification('Running compliance analysis...', 'info');
+        
+        setTimeout(() => {
+            const results = `
+                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>FAR 52.204-21 Basic Safeguarding - COMPLIANT</span></div>
+                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>DFARS 252.204-7012 CUI Requirements - COMPLIANT</span></div>
+                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>NIST 800-171 Security Controls - COMPLIANT</span></div>
+                <div class="compliance-item"><div class="compliance-checkbox">⚠</div><span>CMMC Requirements - REVIEW NEEDED</span></div>
+                <div class="compliance-item"><div class="compliance-checkbox checked">✓</div><span>Security Classification Handling - COMPLIANT</span></div>
+            `;
+            document.getElementById('complianceResultsContent').innerHTML = results;
+            document.getElementById('complianceResults').style.display = 'block';
+            showNotification('Compliance check completed', 'success');
+        }, 2000);
+    }
+
+    // History functions
+    function showVersionHistory() {
+        showNotification('Opening version history viewer...', 'info');
+        setTimeout(() => {
+            showNotification('Version history loaded', 'success');
+        }, 1000);
+    }
+
+    // Audit functions
+    function exportAuditLog() {
+        showNotification('Generating audit log export...', 'info');
+        setTimeout(() => {
+            showNotification('Audit log exported successfully', 'success');
+        }, 1500);
+    }
+
+    // Demo mode exit
+    function exitDemoMode() {
+        if (confirm('Are you sure you want to exit demo mode? You will need to re-authenticate.')) {
+            isAuthenticated = false;
+            currentUser = null;
+            document.getElementById('currentUserEmail').textContent = '';
+            document.getElementById('exitDemoBtn').style.display = 'none';
+            document.getElementById('authOverlay').style.display = 'flex';
+            showNotification('Demo mode exited', 'info');
+        }
     }
 
     // Chat functions
