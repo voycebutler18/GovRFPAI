@@ -103,7 +103,7 @@ def login_required(f):
     @wraps(f)  # This preserves the original function name and metadata
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            return redirect(url_for('login'))
+            return redirect(url_for('login_page'))  # ← FIX: Use 'login_page'
         return f(*args, **kwargs)
     return decorated_function
 
