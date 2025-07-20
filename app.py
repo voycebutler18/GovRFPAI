@@ -117,10 +117,30 @@ def log_audit_event(user_id, action, details):
     })
 
 @app.route('/')
-def index():
-    """Main application route"""
-    return render_template('index.html')
+def home():
+    """Landing page - home.html"""
+    return render_template('home.html')
 
+@app.route('/')
+def home():
+    """Landing page - home.html"""
+    return render_template('home.html')
+
+@app.route('/login')
+def login_page():
+    """Email authentication page"""
+    return render_template('login.html')
+
+@app.route('/app')
+def main_app():
+    """Main RFP application (requires authentication)"""
+    return render_template('app.html')
+
+@app.route('/signup')
+def signup_page():
+    """Signup page (redirect to login for now)"""
+    return redirect(url_for('login_page'))
+    
 @app.route('/api/auth/cac', methods=['POST'])
 def authenticate_cac():
     """Simulate CAC authentication"""
