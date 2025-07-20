@@ -198,23 +198,29 @@ def logout():
 @app.route('/api/rfp/generate', methods=['POST'])
 @login_required
 def generate_rfp():
-    """Generate RFP using AI simulation"""
+    """
+    API endpoint to generate an RFP document using the real OpenAI API.
+    """
+    # First, check if the OpenAI client was initialized correctly.
+    if not client:
+        return jsonify({'error': 'OpenAI client is not configured. Please check your API key environment variable.'}), 500
+
     data = request.json
     user_id = session['user_id']
-    
-    # Validate required fields
+
+    # Validate that all required fields were sent from the front-end.
     required_fields = ['project_title', 'mission_objective', 'acquisition_type', 'security_level']
-    for field in required_fields:
-        if not data.get(field):
-            return jsonify({'error': f'Missing required field: {field}'}), 400
-    
-    # Generate RFP document
+    if not all(field in data for field in required_fields):
+        return jsonify({'error': 'Missing one or more required fields.'}), 400
+
+    # Call the new function to get the AI-generated content.
+    generated_content = generate_rfp_content_with_openai(data)
+
+    # Create and store the new RFP document in memory.
     rfp_id = str(uuid.uuid4())
-    rfp_number = f"RFP-{datetime.now().year}-{len(rfp_documents) + 1:03d}"
-    
     rfp_document = {
         'id': rfp_id,
-        'number': rfp_number,
+        'number': f"RFP-{datetime.now().year}-{len(rfp_documents) + 1:03d}",
         'title': data['project_title'],
         'objective': data['mission_objective'],
         'acquisition_type': data['acquisition_type'],
@@ -225,89 +231,76 @@ def generate_rfp():
         'created_by': user_id,
         'created_at': datetime.now().isoformat(),
         'updated_at': datetime.now().isoformat(),
-        'content': generate_rfp_content(data)
+        'content': generated_content  # Use the content from the OpenAI API call
     }
-    
     rfp_documents[rfp_id] = rfp_document
     
-    log_audit_event(user_id, 'RFP_GENERATED', f'RFP generated: {data["project_title"]}')
+    log_audit_event(user_id, 'RFP_GENERATED', f'Generated RFP: {data["project_title"]}')
     
+    # Return the complete RFP document to the front-end.
     return jsonify({
         'success': True,
         'rfp_id': rfp_id,
-        'rfp_number': rfp_number,
+        'rfp_number': rfp_document['number'],
         'content': rfp_document['content'],
-        'message': 'RFP generated successfully'
+        'message': 'RFP generated successfully using OpenAI'
     })
 
-def generate_rfp_content(data):
-    """Generate RFP content based on input data"""
+def generate_rfp_content_with_openai(data):
+    """
+    Constructs a detailed prompt and calls the OpenAI API to generate RFP content.
+    This function replaces your old simulation function.
+    """
+    # Gather and format the data for the prompt.
     acq_type_name = ACQUISITION_TYPES.get(data['acquisition_type'], 'Standard Contract')
     security_name = SECURITY_LEVELS.get(data['security_level'], 'Standard')
     
-    # Generate compliance requirements text
-    compliance_text = ""
+    compliance_text = "None specified."
     if data.get('compliance_requirements'):
-        compliance_items = [COMPLIANCE_STANDARDS.get(req, req) for req in data['compliance_requirements']]
-        compliance_text = "\n".join([f"<li>{item}</li>" for item in compliance_items])
+        items = [COMPLIANCE_STANDARDS.get(req, req) for req in data['compliance_requirements']]
+        compliance_text = "\n".join([f"- {item}" for item in items])
+
+    # This detailed prompt is the key to getting a high-quality response from the AI.
+    prompt = f"""
+    Act as a professional Department of Defense (DoD) contracting officer. Your task is to generate the full text for a Request for Proposal (RFP) document.
+    The document must be formal, well-structured, and use appropriate language for government contracting.
     
-    content = f"""
-    <div class="rfp-section">
-        <h3>1. INTRODUCTION</h3>
-        <p>The Department of Defense hereby solicits proposals for {data['project_title']}. This acquisition will be conducted under {acq_type_name} authority with {security_name} security classification requirements.</p>
-    </div>
+    Use the following information to construct the RFP:
+    - Project Title: {data['project_title']}
+    - Acquisition Authority: {acq_type_name}
+    - Security Classification: {security_name}
+    - Statement of Work / Mission Objective: {data['mission_objective']}
+    - Mandatory Compliance Standards:
+      {compliance_text}
+      
+    Structure the output with the following sections, generating professional and detailed content for each section based on the provided details:
+    1. INTRODUCTION
+    2. SCOPE OF WORK (SOW)
+    3. TECHNICAL REQUIREMENTS
+    4. SECURITY REQUIREMENTS (Incorporate the mandatory compliance standards here)
+    5. EVALUATION CRITERIA (Use standard DoD criteria: Technical, Past Performance, Management, Cost)
+    6. SUBMISSION REQUIREMENTS
+    7. CONTRACT INFORMATION
     
-    <div class="rfp-section">
-        <h3>2. SCOPE OF WORK</h3>
-        <p>{data['mission_objective']}</p>
-        <p>The contractor shall provide all necessary personnel, equipment, facilities, and services to accomplish the stated objectives in compliance with all applicable federal regulations and security requirements.</p>
-    </div>
-    
-    <div class="rfp-section">
-        <h3>3. TECHNICAL REQUIREMENTS</h3>
-        <p>All deliverables must meet the following technical specifications:</p>
-        <ul style="margin-left: 20px;">
-            <li>Compliance with relevant DoD and federal standards</li>
-            <li>Integration with existing government systems</li>
-            <li>Scalability for future requirements</li>
-            <li>Comprehensive documentation and training materials</li>
-        </ul>
-    </div>
-    
-    <div class="rfp-section">
-        <h3>4. SECURITY REQUIREMENTS</h3>
-        <p>This contract requires {security_name} security clearance. The following security standards apply:</p>
-        <ul style="margin-left: 20px;">
-            {compliance_text}
-        </ul>
-    </div>
-    
-    <div class="rfp-section">
-        <h3>5. EVALUATION CRITERIA</h3>
-        <p>Proposals will be evaluated based on the following criteria:</p>
-        <ul style="margin-left: 20px;">
-            <li>Technical Approach (40%)</li>
-            <li>Management Approach (25%)</li>
-            <li>Past Performance (20%)</li>
-            <li>Cost/Price (15%)</li>
-        </ul>
-    </div>
-    
-    <div class="rfp-section">
-        <h3>6. SUBMISSION REQUIREMENTS</h3>
-        <p>Proposals must be submitted electronically through the designated secure portal no later than [INSERT DATE]. Late submissions will not be considered.</p>
-    </div>
-    
-    <div class="rfp-section">
-        <h3>7. CONTRACT INFORMATION</h3>
-        <p>Contract Type: {acq_type_name}<br>
-        Estimated Value: {data.get('contract_value', 'TBD')}<br>
-        Period of Performance: [INSERT PERIOD]<br>
-        Place of Performance: [INSERT LOCATION]</p>
-    </div>
+    Generate the full text for the RFP document. The output should be formatted as simple HTML using <p>, <h3>, and <ul>/<li> tags where appropriate. Do not include any other text or explanation outside of the HTML document.
     """
-    
-    return content
+
+    try:
+        # This is the actual call to the OpenAI API.
+        response = client.chat.completions.create(
+            model="gpt-4o",  # You can also use "gpt-3.5-turbo" for faster, cheaper responses
+            messages=[
+                {"role": "system", "content": "You are a professional DoD contracting officer assistant that generates RFP documents."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        # Return only the AI-generated content.
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"--- OpenAI API Call Failed ---: {e}")
+        # Provide a useful error message to the front-end if the API call fails.
+        return f"<h3>Error: AI Content Generation Failed</h3><p>The connection to the OpenAI service failed. Please check the server logs for details.</p><p><strong>Error Details:</strong> {e}</p>"
+
 @app.route('/', methods=['POST'])
 def generate():
     title = request.form.get('title')
