@@ -20,9 +20,10 @@ try:
         print("Warning: OPENAI_API_KEY environment variable not set")
 except Exception as e:
     print(f"Failed to initialize OpenAI client: {e}")
+
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(32)  # Generate a secure secret key
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)  # Session timeout
+app.secret_key = secrets.token_hex(32)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
 
 # In-memory storage (replace with database in production)
 users = {}
@@ -53,7 +54,6 @@ COMPLIANCE_STANDARDS = {
     'dfars': 'DFARS (Defense Federal Acquisition)'
 }
 
-# Initialize default templates
 def initialize_templates():
     """Initialize default RFP templates"""
     default_templates = {
@@ -98,12 +98,11 @@ def initialize_templates():
     for template_id, template_data in default_templates.items():
         templates[template_id] = template_data
 
-# Authentication decorator - FIXED to preserve function names
 def login_required(f):
-    @wraps(f)  # This preserves the original function name and metadata
+    @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            return redirect(url_for('login_page'))  # ← FIX: Use 'login_page'
+            return jsonify({'error': 'Authentication required', 'redirect': '/login'}), 401
         return f(*args, **kwargs)
     return decorated_function
 
@@ -117,10 +116,16 @@ def log_audit_event(user_id, action, details):
         'ip_address': request.remote_addr
     })
 
+# ===== MAIN ROUTES =====
 @app.route('/')
 def home():
     """Landing page - home.html"""
     return render_template('home.html')
+
+@app.route('/signup')
+def signup_page():
+    """Signup page"""
+    return render_template('signup.html')
 
 @app.route('/login')
 def login_page():
@@ -129,18 +134,67 @@ def login_page():
 
 @app.route('/app')
 def main_app():
-    """Main RFP application (requires authentication)"""
-    return render_template('index.html')  # Change from 'app.html' to 'index.html'
+    """Main RFP application"""
+    return render_template('index.html')
 
-@app.route('/signup')
-def signup_page():
-    """Signup page (redirect to login for now)"""
-    return redirect(url_for('login_page'))
-    
+# ===== AUTHENTICATION ROUTES =====
+@app.route('/api/auth/verify', methods=['POST'])
+def verify_session():
+    """Verify frontend authentication and create Flask session"""
+    try:
+        data = request.json
+        email = data.get('email')
+        name = data.get('name', 'Unknown User')
+        auth_method = data.get('authMethod', 'unknown')
+        role = data.get('role', 'User')
+        
+        if not email:
+            return jsonify({'error': 'Email required'}), 400
+        
+        # Create user session for Flask
+        user_id = str(uuid.uuid4())
+        user_data = {
+            'id': user_id,
+            'name': name,
+            'email': email,
+            'role': role,
+            'clearance': 'Demo' if auth_method == 'demo' else 'Secret',
+            'auth_method': auth_method
+        }
+        
+        users[user_id] = user_data
+        session['user_id'] = user_id
+        session.permanent = True
+        
+        log_audit_event(user_id, 'SESSION_CREATED', f'Session created for {email}')
+        
+        return jsonify({
+            'success': True,
+            'user': user_data,
+            'message': 'Session verified'
+        })
+        
+    except Exception as e:
+        print(f"Session verification error: {e}")
+        return jsonify({'error': 'Session verification failed'}), 500
+
+@app.route('/api/auth/status', methods=['GET'])
+def check_auth_status():
+    """Check if user is authenticated"""
+    if 'user_id' in session and session['user_id'] in users:
+        user_data = users[session['user_id']]
+        return jsonify({
+            'authenticated': True,
+            'user': user_data
+        })
+    else:
+        return jsonify({
+            'authenticated': False
+        })
+
 @app.route('/api/auth/cac', methods=['POST'])
 def authenticate_cac():
     """Simulate CAC authentication"""
-    # In production, this would integrate with actual CAC/PIV systems
     user_id = str(uuid.uuid4())
     user_data = {
         'id': user_id,
@@ -222,63 +276,79 @@ def logout():
     
     return jsonify({'success': True, 'message': 'Logged out successfully'})
 
+# ===== RFP GENERATION ROUTES =====
 @app.route('/api/rfp/generate', methods=['POST'])
 @login_required
 def generate_rfp():
-    """
-    API endpoint to generate an RFP document using the real OpenAI API.
-    """
-    # First, check if the OpenAI client was initialized correctly.
+    """API endpoint to generate an RFP document using OpenAI API"""
+    print("=== RFP Generation Endpoint Called ===")
+    
     if not client:
+        print("ERROR: OpenAI client not configured")
         return jsonify({'error': 'OpenAI client is not configured. Please check your API key environment variable.'}), 500
 
-    data = request.json
-    user_id = session['user_id']
+    try:
+        data = request.json
+        print(f"Received data: {data}")
+        user_id = session['user_id']
+        print(f"User ID: {user_id}")
 
-    # Validate that all required fields were sent from the front-end.
-    required_fields = ['project_title', 'mission_objective', 'acquisition_type', 'security_level']
-    if not all(field in data for field in required_fields):
-        return jsonify({'error': 'Missing one or more required fields.'}), 400
+        required_fields = ['project_title', 'mission_objective', 'acquisition_type', 'security_level']
+        if not all(field in data for field in required_fields):
+            missing_fields = [field for field in required_fields if field not in data]
+            print(f"Missing fields: {missing_fields}")
+            return jsonify({'error': f'Missing required fields: {missing_fields}'}), 400
 
-    # Call the new function to get the AI-generated content.
-    generated_content = generate_rfp_content_with_openai(data)
+        print("=== Calling OpenAI generation function ===")
+        generated_content = generate_rfp_content_with_openai(data)
+        print("=== OpenAI generation completed ===")
 
-    # Create and store the new RFP document in memory.
-    rfp_id = str(uuid.uuid4())
-    rfp_document = {
-        'id': rfp_id,
-        'number': f"RFP-{datetime.now().year}-{len(rfp_documents) + 1:03d}",
-        'title': data['project_title'],
-        'objective': data['mission_objective'],
-        'acquisition_type': data['acquisition_type'],
-        'security_level': data['security_level'],
-        'contract_value': data.get('contract_value', 'simplified'),
-        'compliance_requirements': data.get('compliance_requirements', []),
-        'status': 'draft',
-        'created_by': user_id,
-        'created_at': datetime.now().isoformat(),
-        'updated_at': datetime.now().isoformat(),
-        'content': generated_content  # Use the content from the OpenAI API call
-    }
-    rfp_documents[rfp_id] = rfp_document
-    
-    log_audit_event(user_id, 'RFP_GENERATED', f'Generated RFP: {data["project_title"]}')
-    
-    # Return the complete RFP document to the front-end.
-    return jsonify({
-        'success': True,
-        'rfp_id': rfp_id,
-        'rfp_number': rfp_document['number'],
-        'content': rfp_document['content'],
-        'message': 'RFP generated successfully using OpenAI'
-    })
+        rfp_id = str(uuid.uuid4())
+        rfp_document = {
+            'id': rfp_id,
+            'number': f"RFP-{datetime.now().year}-{len(rfp_documents) + 1:03d}",
+            'title': data['project_title'],
+            'objective': data['mission_objective'],
+            'acquisition_type': data['acquisition_type'],
+            'security_level': data['security_level'],
+            'contract_value': data.get('contract_value', 'simplified'),
+            'compliance_requirements': data.get('compliance_requirements', []),
+            'status': 'draft',
+            'created_by': user_id,
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat(),
+            'content': generated_content
+        }
+        rfp_documents[rfp_id] = rfp_document
+        
+        log_audit_event(user_id, 'RFP_GENERATED', f'Generated RFP: {data["project_title"]}')
+        
+        print(f"=== RFP Created Successfully - ID: {rfp_id} ===")
+        
+        return jsonify({
+            'success': True,
+            'rfp_id': rfp_id,
+            'rfp_number': rfp_document['number'],
+            'content': rfp_document['content'],
+            'message': 'RFP generated successfully using OpenAI'
+        })
+        
+    except Exception as e:
+        print(f"=== GENERAL ERROR in generate_rfp ===: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 def generate_rfp_content_with_openai(data):
-    """
-    Constructs a detailed prompt and calls the OpenAI API to generate RFP content.
-    This function replaces your old simulation function.
-    """
-    # Gather and format the data for the prompt.
+    """Generate RFP content using OpenAI API"""
+    print(f"=== OpenAI Generation Started ===")
+    print(f"Input data: {data}")
+    
+    if not client:
+        error_msg = "OpenAI client is not initialized"
+        print(f"ERROR: {error_msg}")
+        return f"<h3>Error: {error_msg}</h3><p>Please check your API key configuration.</p>"
+    
     acq_type_name = ACQUISITION_TYPES.get(data['acquisition_type'], 'Standard Contract')
     security_name = SECURITY_LEVELS.get(data['security_level'], 'Standard')
     
@@ -287,47 +357,51 @@ def generate_rfp_content_with_openai(data):
         items = [COMPLIANCE_STANDARDS.get(req, req) for req in data['compliance_requirements']]
         compliance_text = "\n".join([f"- {item}" for item in items])
 
-    # This detailed prompt is the key to getting a high-quality response from the AI.
     prompt = f"""
-    Act as a professional Department of Defense (DoD) contracting officer. Your task is to generate the full text for a Request for Proposal (RFP) document.
+    Act as a professional Department of Defense (DoD) contracting officer. Your task is to generate a comprehensive, detailed Request for Proposal (RFP) document.
     The document must be formal, well-structured, and use appropriate language for government contracting.
     
-    Use the following information to construct the RFP:
+    Project Information:
     - Project Title: {data['project_title']}
     - Acquisition Authority: {acq_type_name}
     - Security Classification: {security_name}
-    - Statement of Work / Mission Objective: {data['mission_objective']}
-    - Mandatory Compliance Standards:
-      {compliance_text}
-      
-    Structure the output with the following sections, generating professional and detailed content for each section based on the provided details:
-    1. INTRODUCTION
-    2. SCOPE OF WORK (SOW)
-    3. TECHNICAL REQUIREMENTS
-    4. SECURITY REQUIREMENTS (Incorporate the mandatory compliance standards here)
-    5. EVALUATION CRITERIA (Use standard DoD criteria: Technical, Past Performance, Management, Cost)
-    6. SUBMISSION REQUIREMENTS
-    7. CONTRACT INFORMATION
+    - Statement of Work: {data['mission_objective']}
+    - Compliance Requirements: {compliance_text}
     
-    Generate the full text for the RFP document. The output should be formatted as simple HTML using <p>, <h3>, and <ul>/<li> tags where appropriate. Do not include any other text or explanation outside of the HTML document.
+    Generate a complete RFP with these sections:
+    
+    1. INTRODUCTION - Include background, purpose, and acquisition authority
+    2. SCOPE OF WORK - Detailed requirements, deliverables, and performance standards
+    3. TECHNICAL REQUIREMENTS - Specific technical specifications, standards, and testing requirements
+    4. SECURITY REQUIREMENTS - Security clearances, compliance standards, and protection requirements
+    5. EVALUATION CRITERIA - Detailed scoring methodology with weights (Technical 40%, Past Performance 25%, Management 20%, Cost 15%)
+    6. SUBMISSION REQUIREMENTS - Proposal format, page limits, and submission instructions
+    7. CONTRACT INFORMATION - Contract type, period of performance, and key terms
+    8. INSTRUCTIONS TO OFFERORS - Detailed submission process and requirements
+    
+    Make each section comprehensive with specific details. Use professional government contracting language.
+    Format output as HTML using <h3>, <p>, <ul>, and <li> tags. Make it detailed and substantial - at least 1500 words total.
     """
 
     try:
-        # This is the actual call to the OpenAI API.
+        print("=== Calling OpenAI API ===")
         response = client.chat.completions.create(
-            model="gpt-4o",  # You can also use "gpt-3.5-turbo" for faster, cheaper responses
+            model="gpt-4o",
             messages=[
-                {"role": "system", "content": "You are a professional DoD contracting officer assistant that generates RFP documents."},
+                {"role": "system", "content": "You are a professional DoD contracting officer assistant that generates comprehensive RFP documents."},
                 {"role": "user", "content": prompt}
             ]
         )
-        # Return only the AI-generated content.
-        return response.choices[0].message.content
+        print("=== OpenAI API Call Successful ===")
+        result = response.choices[0].message.content
+        print(f"Generated content length: {len(result)} characters")
+        return result
     except Exception as e:
-        print(f"--- OpenAI API Call Failed ---: {e}")
-        # Provide a useful error message to the front-end if the API call fails.
+        error_msg = f"OpenAI API Call Failed: {str(e)}"
+        print(f"=== ERROR ===: {error_msg}")
         return f"<h3>Error: AI Content Generation Failed</h3><p>The connection to the OpenAI service failed. Please check the server logs for details.</p><p><strong>Error Details:</strong> {e}</p>"
 
+# ===== TEMPLATE ROUTES =====
 @app.route('/api/templates/<template_id>', methods=['GET'])
 @login_required
 def get_template(template_id):
@@ -371,6 +445,7 @@ def save_template():
         'message': 'Template saved successfully'
     })
 
+# ===== OTHER API ROUTES =====
 @app.route('/api/rfp/<rfp_id>', methods=['GET'])
 @login_required
 def get_rfp(rfp_id):
@@ -379,7 +454,6 @@ def get_rfp(rfp_id):
     if not rfp:
         return jsonify({'error': 'RFP not found'}), 404
     
-    # Check if user has access to this RFP
     if rfp['created_by'] != session['user_id']:
         return jsonify({'error': 'Access denied'}), 403
     
@@ -405,21 +479,17 @@ def chat_with_ai():
     if not message:
         return jsonify({'error': 'Message cannot be empty'}), 400
     
-    # Initialize chat history for user if not exists
     if user_id not in chat_history:
         chat_history[user_id] = []
     
-    # Add user message to history
     chat_history[user_id].append({
         'type': 'user',
         'message': message,
         'timestamp': datetime.now().isoformat()
     })
     
-    # Generate AI response
     ai_response = generate_ai_response(message)
     
-    # Add AI response to history
     chat_history[user_id].append({
         'type': 'ai',
         'message': ai_response,
@@ -449,12 +519,10 @@ def generate_ai_response(message):
         'fisma': 'FISMA requires federal agencies to develop, document, and implement information security programs. For contractors, this means implementing appropriate security controls and conducting regular assessments.'
     }
     
-    # Check for keywords in message
     for keyword, response in responses.items():
         if keyword in message_lower:
             return response
     
-    # Default response
     return 'I can help with FAR regulations, security requirements, evaluation criteria, contract types, and more. What specific aspect of RFP development would you like to discuss?'
 
 @app.route('/api/compliance/check', methods=['POST'])
@@ -467,14 +535,11 @@ def check_compliance():
     if not rfp_id or rfp_id not in rfp_documents:
         return jsonify({'error': 'RFP not found'}), 404
     
-    rfp = rfp_documents[rfp_id]
-    
-    # Simulate compliance checking
     compliance_results = {
         'far_compliance': True,
         'security_clauses': True,
         'evaluation_criteria': True,
-        'cmmc_requirements': False,  # Simulate a warning
+        'cmmc_requirements': False,
         'overall_score': 85,
         'warnings': ['CMMC requirements need review'],
         'recommendations': [
@@ -497,8 +562,6 @@ def get_audit_logs():
     """Get audit logs for current user"""
     user_id = session['user_id']
     user_logs = [log for log in audit_logs if log['user_id'] == user_id]
-    
-    # Sort by timestamp, most recent first
     user_logs.sort(key=lambda x: x['timestamp'], reverse=True)
     
     return jsonify({'audit_logs': user_logs})
@@ -508,14 +571,9 @@ def get_audit_logs():
 def get_dashboard_data():
     """Get dashboard data for current user"""
     user_id = session['user_id']
-    
-    # Get user's RFPs
     user_rfps = [rfp for rfp in rfp_documents.values() if rfp['created_by'] == user_id]
-    
-    # Get recent activity
     recent_logs = [log for log in audit_logs if log['user_id'] == user_id][-5:]
     
-    # Generate statistics
     stats = {
         'total_rfps': len(user_rfps),
         'draft_rfps': len([rfp for rfp in user_rfps if rfp['status'] == 'draft']),
@@ -527,9 +585,10 @@ def get_dashboard_data():
     return jsonify({
         'success': True,
         'stats': stats,
-        'recent_rfps': user_rfps[-5:]  # Last 5 RFPs
+        'recent_rfps': user_rfps[-5:]
     })
 
+# ===== ERROR HANDLERS =====
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Endpoint not found'}), 404
@@ -539,10 +598,8 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
-    # Initialize templates on startup
     initialize_templates()
     
-    # Run the application
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('DEBUG', 'False').lower() == 'true'
     
