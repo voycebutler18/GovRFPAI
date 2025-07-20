@@ -8,6 +8,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import openai
 
+# Initialize OpenAI client
+client = None
+try:
+    openai_api_key = os.environ.get('OPENAI_API_KEY')
+    if openai_api_key:
+        client = OpenAI(api_key=openai_api_key)
+        print("OpenAI client initialized successfully")
+    else:
+        print("Warning: OPENAI_API_KEY environment variable not set")
+except Exception as e:
+    print(f"Failed to initialize OpenAI client: {e}")
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)  # Generate a secure secret key
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)  # Session timeout
