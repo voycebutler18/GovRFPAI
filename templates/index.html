@@ -18,7 +18,7 @@
             --text-primary: #F9FAFB; /* Off-white for primary text */
             --text-secondary: #D1D5DB; /* Lighter gray for secondary text */
             --text-muted: #9CA3AF;
-            --accent-gold: #D97706; /* Amber/Gold */
+            --accent-gold: #F59E0B; /* Amber/Gold */
             --accent-green: #10B981; /* Green for success */
             --accent-red: #EF4444; /* Red for errors */
             --accent-blue: #3B82F6; /* Blue for info */
@@ -53,6 +53,7 @@
             padding: 24px;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
 
         .logo {
@@ -63,6 +64,13 @@
             margin-bottom: 32px;
             text-align: center;
             letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
         }
 
         .nav-section {
@@ -113,6 +121,7 @@
             padding: 20px 32px;
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-medium);
+            flex-shrink: 0;
         }
 
         .header h1 {
@@ -216,38 +225,39 @@
             gap: 8px;
         }
 
-        .btn-primary {
-            background: var(--accent-blue);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #60A5FA;
-        }
+        .btn-primary { background: var(--accent-blue); color: white; }
+        .btn-primary:hover { background: #60A5FA; }
 
         .btn-secondary {
             background: var(--bg-light);
             color: var(--text-primary);
             border-color: var(--border-color);
         }
+        .btn-secondary:hover { background: var(--border-color); }
 
-        .btn-secondary:hover {
-            background: var(--border-color);
-        }
-
-        .compliance-panel {
+        .compliance-panel, .feature-card {
             background: var(--bg-medium);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 24px;
             margin-bottom: 24px;
         }
+        .feature-card { cursor: pointer; transition: all 0.2s; }
+        .feature-card:hover { border-color: var(--accent-blue); transform: translateY(-2px); }
 
-        .compliance-title {
+        .compliance-title, .section-title {
             font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 16px;
+        }
+        .section-title { padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+
+        .compliance-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         
         .compliance-checkbox {
@@ -279,6 +289,7 @@
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
+            flex-shrink: 0;
         }
 
         .status-badge {
@@ -289,79 +300,48 @@
             text-transform: uppercase;
         }
         .status-badge.secure { background: #059669; color: white; }
-        .status-badge.draft { background: #D97706; color: white; }
-
-        .message.user {
-            background: var(--bg-light);
-            padding: 12px;
-            border-radius: 8px;
-            margin-left: 40px;
-            margin-bottom: 16px;
-        }
-
-        .message.ai {
-            background: #2a3447;
-            padding: 12px;
-            border-radius: 8px;
-            margin-right: 40px;
-            margin-bottom: 16px;
-        }
+        .status-badge.draft { background: var(--accent-gold); color: white; }
+        
+        .message { margin-bottom: 16px; padding: 12px; border-radius: 8px; }
+        .message.user { background: var(--bg-light); margin-left: 40px; }
+        .message.ai { background: #2a3447; margin-right: 40px; }
 
         .hidden { display: none; }
 
         .rfp-preview {
-            background: var(--bg-medium);
-            border: 1px solid var(--border-color);
+            background: #e2e8f0;
+            border: 1px solid #94a3b8;
+            color: #1e293b;
             border-radius: 8px;
             padding: 32px;
             margin-top: 24px;
             font-family: 'Times New Roman', serif;
-            color: var(--text-secondary);
+            line-height: 1.8;
         }
-        .rfp-preview h3 { color: var(--text-primary); }
+        .rfp-header { text-align: center; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid #1e293b; }
+        .rfp-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
+        .rfp-number { font-size: 16px; color: #475569; }
+        .rfp-section { margin-bottom: 24px; }
+        .rfp-section h3 { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #1e293b; }
 
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--bg-light);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 24px;
-        }
-        .progress-fill { background: var(--accent-blue); }
-
-        .feature-card {
-            background: var(--bg-medium);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-        .feature-card:hover { border-color: var(--accent-blue); }
-        .feature-icon { background: var(--bg-light); }
-
-        .auth-overlay { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(5px); }
-        .auth-modal {
-            background: var(--bg-medium);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .auth-title { color: var(--text-primary); }
-        .auth-subtitle { color: var(--text-muted); }
-        .auth-button {
-            background: var(--bg-light);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-        .auth-button:hover {
-            background: var(--border-color);
-            border-color: var(--accent-blue);
-        }
+        .progress-bar { width: 100%; height: 6px; background: var(--bg-light); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+        .progress-fill { height: 100%; background: var(--accent-blue); transition: width 0.3s ease; }
         
-        .notification {
-            font-weight: 700;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px; }
+        .feature-icon {
+            width: 32px; height: 32px; background: var(--bg-light); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 1.2rem;
         }
+
+        .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .auth-modal { background: var(--bg-medium); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-title { font-size: 24px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; }
+        .auth-subtitle { color: var(--text-muted); margin-bottom: 24px; }
+        .auth-button { width: 100%; padding: 16px; margin-bottom: 12px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--bg-light); font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text-primary); }
+        .auth-button:hover { border-color: var(--accent-blue); background: var(--border-color); }
+        
+        .notification { position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; font-weight: 600; z-index: 1001; transform: translateX(120%); transition: transform 0.3s ease; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        .notification.show { transform: translateX(0); }
         .notification.success { background: var(--accent-green); }
         .notification.error { background: var(--accent-red); }
         .notification.info { background: var(--accent-blue); }
@@ -372,15 +352,9 @@
         <div class="auth-modal">
             <h2 class="auth-title">Secure Access Required</h2>
             <p class="auth-subtitle">Please authenticate using your DoD-approved credentials.</p>
-            <button class="auth-button" onclick="authenticateCAC()">
-                <span style="font-size: 1.2rem; margin-right: 8px;">💳</span> CAC/PIV Authentication
-            </button>
-            <button class="auth-button" onclick="authenticateEmail()">
-                <span style="font-size: 1.2rem; margin-right: 8px;">✉️</span> Secure Email Domain Login
-            </button>
-            <button class="auth-button" onclick="authenticateDemo()">
-                <span style="font-size: 1.2rem; margin-right: 8px;">🧪</span> Demo Mode
-            </button>
+            <button class="auth-button" onclick="authenticateCAC()">🔐 CAC/PIV Authentication</button>
+            <button class="auth-button" onclick="authenticateEmail()">✉️ Secure Email Domain</button>
+            <button class="auth-button" onclick="authenticateDemo()">🚀 Demo Mode</button>
         </div>
     </div>
 
@@ -388,32 +362,28 @@
         <aside class="sidebar">
             <div class="logo">GovRFP AI</div>
             
-            <nav class="nav-section">
-                <div class="nav-title">Workspace</div>
-                <div class="nav-item" onclick="showSection('dashboard')">🏠 Dashboard</div>
-                <div class="nav-item active" onclick="showSection('generator')">✨ RFP Generator</div>
-            </nav>
+            <div class="nav-section">
+                <div class="nav-title">Tools</div>
+                <div class="nav-item" onclick="showSection('dashboard')"><div class="nav-icon">🏠</div>Dashboard</div>
+                <div class="nav-item active" onclick="showSection('generator')"><div class="nav-icon">✨</div>RFP Generator</div>
+                <div class="nav-item" onclick="showSection('templates')"><div class="nav-icon">📄</div>Templates</div>
+                <div class="nav-item" onclick="showSection('compliance')"><div class="nav-icon">✅</div>Compliance Check</div>
+                <div class="nav-item" onclick="showSection('history')"><div class="nav-icon">📚</div>Document History</div>
+            </div>
 
-            <nav class="nav-section">
+            <div class="nav-section">
                 <div class="nav-title">Acquisition Types</div>
-                <div class="nav-item" onclick="setAcquisitionType('far')">📋 FAR Contracts</div>
-                <div class="nav-item" onclick="setAcquisitionType('ota')">⚡ OTA</div>
-                <div class="nav-item" onclick="setAcquisitionType('cso')">💡 CSO</div>
-                <div class="nav-item" onclick="setAcquisitionType('sbir')">🔬 SBIR/STTR</div>
-            </nav>
-
-            <nav class="nav-section">
-                <div class="nav-title">Resources</div>
-                <div class="nav-item" onclick="showSection('templates')">📄 Templates</div>
-                <div class="nav-item" onclick="showSection('compliance')">✅ Compliance Check</div>
-                <div class="nav-item" onclick="showSection('history')">📚 Document History</div>
-            </nav>
+                <div class="nav-item" onclick="setAcquisitionType('far')"><div class="nav-icon">📋</div>FAR Contracts</div>
+                <div class="nav-item" onclick="setAcquisitionType('ota')"><div class="nav-icon">⚡</div>OTA</div>
+                <div class="nav-item" onclick="setAcquisitionType('cso')"><div class="nav-icon">💡</div>CSO</div>
+                <div class="nav-item" onclick="setAcquisitionType('sbir')"><div class="nav-icon">🔬</div>SBIR/STTR</div>
+            </div>
             
-            <nav class="nav-section" style="margin-top: auto;">
+            <div class="nav-section" style="margin-top: auto;">
                 <div class="nav-title">System</div>
-                 <div class="nav-item" onclick="showSection('security')">🔒 Security Status</div>
-                <div class="nav-item" onclick="showSection('audit')">📊 Audit Trail</div>
-            </nav>
+                 <div class="nav-item" onclick="showSection('security')"><div class="nav-icon">🔒</div>Security Status</div>
+                <div class="nav-item" onclick="showSection('audit')"><div class="nav-icon">📊</div>Audit Trail</div>
+            </div>
         </aside>
 
         <main class="main-content">
@@ -424,59 +394,87 @@
 
             <div class="content-area">
                 <div class="main-panel">
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+
                     <div id="dashboardSection" class="section hidden">
+                        <div class="feature-grid">
+                            <div class="feature-card" onclick="showSection('generator')">
+                                <div class="feature-icon">✨</div><h3>AI RFP Generator</h3><p>Create comprehensive RFPs from simple project descriptions.</p>
+                            </div>
+                            <div class="feature-card" onclick="showSection('templates')">
+                                <div class="feature-icon">📄</div><h3>Template Library</h3><p>Access pre-built templates for common acquisition types.</p>
+                            </div>
+                            <div class="feature-card" onclick="showSection('compliance')">
+                                <div class="feature-icon">✅</div><h3>Compliance Checker</h3><p>Ensure your RFPs meet all regulatory requirements.</p>
+                            </div>
+                            <div class="feature-card" onclick="showSection('history')">
+                                <div class="feature-icon">📚</div><h3>Document History</h3><p>Track versions, approvals, and modifications of your RFPs.</p>
+                            </div>
                         </div>
+                    </div>
 
                     <div id="generatorSection" class="section">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width: 10%"></div>
-                        </div>
                         <div class="input-group">
                             <label class="input-label" for="projectTitle">Project Title</label>
                             <input type="text" class="input-field" id="projectTitle" placeholder="e.g., Next-Generation UAV Communication System">
                         </div>
-                         <div class="input-group">
-                            <label class="input-label" for="missionObjective">Mission Objective & Statement of Work</label>
-                            <textarea class="input-field textarea-field" id="missionObjective" placeholder="Describe the mission objective, key requirements, and expected deliverables..."></textarea>
+                        <div class="input-group">
+                            <label class="input-label" for="missionObjective">Mission Objective & SOW</label>
+                            <textarea class="input-field textarea-field" id="missionObjective" placeholder="Describe the mission objective, key requirements..."></textarea>
                         </div>
                         <div class="input-group">
                             <label class="input-label" for="acquisitionType">Acquisition Type</label>
-                            <select class="input-field select-field" id="acquisitionType">
-                                <option value="far">FAR-Based Contract</option>
-                                <option value="ota">Other Transaction Authority (OTA)</option>
-                                <option value="cso">Commercial Solutions Opening (CSO)</option>
-                                <option value="sbir">SBIR/STTR</option>
-                            </select>
+                            <select class="input-field" id="acquisitionType"><option value="far">FAR-Based Contract</option><option value="ota">OTA</option><option value="cso">CSO</option><option value="sbir">SBIR/STTR</option></select>
                         </div>
-                         <div class="input-group">
+                        <div class="input-group">
                             <label class="input-label" for="securityLevel">Security Classification</label>
-                            <select class="input-field select-field" id="securityLevel">
-                                <option value="cui">CUI (Controlled Unclassified Information)</option>
-                                <option value="confidential">Confidential</option>
-                                <option value="secret">Secret</option>
-                                <option value="topsecret">Top Secret</option>
+                            <select class="input-field" id="securityLevel"><option value="cui">CUI</option><option value="confidential">Confidential</option><option value="secret">Secret</option><option value="topsecret">Top Secret</option></select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label" for="placeOfPerformance">Place of Performance</label>
+                            <select class="input-field" id="placeOfPerformance">
+                                <option value="contractor">Contractor's Facility</option><option value="pentagon">Pentagon, Arlington, VA</option><option value="wpafb">Wright-Patterson AFB, OH</option><option value="conus">CONUS</option><option value="worldwide">Worldwide</option><option value="custom">Custom Location</option>
                             </select>
                         </div>
-                        <div class="button-group" style="margin-top: 24px;">
+                         <div id="customLocationGroup" class="input-group" style="display: none;">
+                            <label class="input-label" for="customLocation">Custom Location</label>
+                            <input type="text" class="input-field" id="customLocation" placeholder="Enter specific location">
+                        </div>
+                        <div class="compliance-panel">
+                            <div class="compliance-title">Required Compliance Standards</div>
+                            <div class="compliance-item"><div class="compliance-checkbox" id="nist800171" onclick="toggleCompliance('nist800171')"></div><span>NIST 800-171</span></div>
+                            <div class="compliance-item"><div class="compliance-checkbox" id="cmmc" onclick="toggleCompliance('cmmc')"></div><span>CMMC</span></div>
+                            <div class="compliance-item"><div class="compliance-checkbox" id="fisma" onclick="toggleCompliance('fisma')"></div><span>FISMA</span></div>
+                            <div class="compliance-item"><div class="compliance-checkbox" id="dfars" onclick="toggleCompliance('dfars')"></div><span>DFARS</span></div>
+                        </div>
+                        <div class="button-group">
                             <button class="btn btn-primary" onclick="generateRFP()">✨ Generate RFP</button>
                             <button class="btn btn-secondary" onclick="saveTemplate()">💾 Save as Template</button>
                             <button class="btn btn-secondary" onclick="clearForm()">🗑️ Clear</button>
                         </div>
                         <div id="rfpPreview" class="rfp-preview hidden">
-                             </div>
-                    </div>
-                    </div>
-
-                <aside class="chat-sidebar">
-                    <div class="chat-header">
-                        <h3>AI Assistant</h3>
-                        <p>Ask about regulations, clauses, or drafting.</p>
-                    </div>
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message ai">
-                            <strong>AI:</strong> Ready to assist. Ask about FAR, DFARS, or specific RFP sections.
+                            <div class="rfp-header"><div class="rfp-title" id="rfpTitle"></div><div class="rfp-number" id="rfpNumber"></div></div><div id="rfpContent"></div>
                         </div>
                     </div>
+
+                    <div id="templatesSection" class="section hidden">
+                         <div class="section-title">RFP Template Library</div>
+                         <div class="feature-grid">
+                            <div class="feature-card" onclick="loadTemplate('cyber')"><div class="feature-icon">🔒</div><h3>Cybersecurity Platform</h3><p>Template for IT security and cybersecurity solutions</p></div>
+                            <div class="feature-card" onclick="loadTemplate('medical')"><div class="feature-icon">🏥</div><h3>Medical Device Development</h3><p>Template for medical tech and device contracts</p></div>
+                            <div class="feature-card" onclick="loadTemplate('aerospace')"><div class="feature-icon">🚀</div><h3>Aerospace & Defense</h3><p>Template for aerospace engineering and defense systems</p></div>
+                            <div class="feature-card" onclick="loadTemplate('research')"><div class="feature-icon">🔬</div><h3>Research & Development</h3><p>Template for R&D and innovation projects</p></div>
+                         </div>
+                    </div>
+                    <div id="complianceSection" class="section hidden"><div class="section-title">Compliance Checker</div></div>
+                    <div id="historySection" class="section hidden"><div class="section-title">Document History</div></div>
+                    <div id="securitySection" class="section hidden"><div class="section-title">Security Status</div></div>
+                    <div id="auditSection" class="section hidden"><div class="section-title">Audit Trail</div></div>
+                </div>
+
+                <aside class="chat-sidebar">
+                    <div class="chat-header"><h3>AI Assistant</h3><p>Ask about regulations, clauses, or drafting.</p></div>
+                    <div class="chat-messages" id="chatMessages"><div class="message ai"><strong>AI:</strong> Ready to assist. Ask about FAR, DFARS, or specific RFP sections.</div></div>
                     <div class="chat-input">
                         <input type="text" class="input-field" id="chatInput" placeholder="Type your query..." onkeypress="handleChatKeyPress(event)">
                         <button class="btn btn-primary" onclick="sendChatMessage()" style="margin-top: 12px; width: 100%;">Send</button>
@@ -488,11 +486,9 @@
                 <div style="display: flex; gap: 24px; align-items: center;">
                     <div class="status-badge secure">🔒 Secure Connection</div>
                     <div class="status-badge draft">📝 Draft Mode</div>
-                    <span>User: <span id="currentUserEmail">contracting.officer@defense.gov</span></span>
+                    <span>User: <span id="currentUserEmail"></span></span>
                 </div>
-                <div>
-                    Last saved: <span id="lastSaved">Never</span>
-                </div>
+                <div>Last saved: <span id="lastSaved">Never</span></div>
             </footer>
         </main>
     </div>
@@ -500,97 +496,222 @@
     <div id="notification" class="notification"></div>
 
     <script>
-        // --- All original JavaScript functions are preserved and will work with the new layout ---
-        // State management
-        let currentSection = 'generator';
-        let currentAcquisitionType = 'far';
-        let complianceItems = {
-            nist800171: true,
-            cmmc: true,
-            fisma: true,
-            dfars: true
-        };
-        let isAuthenticated = false;
-        let currentUser = { email: 'demo@defense.gov' }; // Default for display
+    // --- THIS IS THE COMPLETE, ORIGINAL JAVASCRIPT TO ENSURE ALL FUNCTIONS WORK ---
+    
+    // State management
+    let currentSection = 'generator';
+    let currentAcquisitionType = 'far';
+    let complianceItems = {
+        nist800171: true,
+        cmmc: true,
+        fisma: true,
+        dfars: true
+    };
+    let isAuthenticated = false;
+    let currentUser = null;
 
-        // Authentication functions
-        function authenticateCAC() {
-            showNotification('Authenticating via CAC/PIV...', 'info');
-            setTimeout(() => {
-                isAuthenticated = true;
-                currentUser = { email: 'john.smith.ctr@mail.mil' };
-                document.getElementById('currentUserEmail').textContent = currentUser.email;
-                document.getElementById('authOverlay').style.display = 'none';
-                showNotification('CAC Authentication Successful', 'success');
-            }, 1500);
-        }
-        function authenticateEmail() { /* ... similar logic ... */ 
+    // Authentication functions
+    function authenticateCAC() {
+        showNotification('CAC authentication initiated...', 'info');
+        setTimeout(() => {
             isAuthenticated = true;
-            currentUser = { email: 'jane.doe@army.mil' };
+            currentUser = { name: 'John Smith', email: 'john.smith@defense.gov' };
             document.getElementById('currentUserEmail').textContent = currentUser.email;
             document.getElementById('authOverlay').style.display = 'none';
-            showNotification('Email Authentication Successful', 'success');
-        }
-        function authenticateDemo() {
+            showNotification('Successfully authenticated via CAC', 'success');
+            initializePage();
+        }, 1500);
+    }
+    function authenticateEmail() {
+        showNotification('Email authentication initiated...', 'info');
+        setTimeout(() => {
             isAuthenticated = true;
-            currentUser = { email: 'demo.user@defense.gov' };
+            currentUser = { name: 'Jane Doe', email: 'jane.doe@army.mil' };
             document.getElementById('currentUserEmail').textContent = currentUser.email;
             document.getElementById('authOverlay').style.display = 'none';
-            showNotification('Demo Mode Activated', 'info');
-        }
+            showNotification('Successfully authenticated via secure email', 'success');
+            initializePage();
+        }, 1000);
+    }
+    function authenticateDemo() {
+        isAuthenticated = true;
+        currentUser = { name: 'Demo User', email: 'demo@defense.gov' };
+        document.getElementById('currentUserEmail').textContent = currentUser.email;
+        document.getElementById('authOverlay').style.display = 'none';
+        showNotification('Demo mode activated', 'success');
+        initializePage();
+    }
+
+    // Navigation functions
+    function showSection(sectionName) {
+        document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
+        document.getElementById(sectionName + 'Section').classList.remove('hidden');
         
-        // Navigation and UI functions
-        function showSection(sectionName) {
-            document.querySelectorAll('.section').forEach(sec => sec.classList.add('hidden'));
-            const sectionEl = document.getElementById(sectionName + 'Section');
-            if(sectionEl) sectionEl.classList.remove('hidden');
-
-            document.querySelectorAll('.sidebar .nav-item').forEach(item => {
-                item.classList.remove('active');
-                if(item.textContent.toLowerCase().includes(sectionName)) {
-                    item.classList.add('active');
-                }
-            });
-
-            const headers = {
-                dashboard: { title: 'Dashboard', desc: 'System Overview and Recent Activity' },
-                generator: { title: 'RFP Generator', desc: 'Create regulation-compliant RFPs with AI assistance' },
-                // ... other headers
-            };
-            if(headers[sectionName]) {
-                 document.getElementById('pageTitle').textContent = headers[sectionName].title;
-                 document.getElementById('pageDescription').textContent = headers[sectionName].desc;
+        document.querySelectorAll('.sidebar .nav-item').forEach(item => {
+            item.classList.remove('active');
+            if(item.getAttribute('onclick').includes(`showSection('${sectionName}')`)) {
+                item.classList.add('active');
             }
-        }
+        });
         
-        function setAcquisitionType(type) {
-            // ... original logic ...
+        const headers = {
+            dashboard: { title: 'Dashboard', desc: 'Overview of your RFP activities and tools' },
+            generator: { title: 'RFP Generator', desc: 'Create regulation-compliant RFPs with AI assistance' },
+            templates: { title: 'Template Library', desc: 'Access pre-built templates' },
+            compliance: { title: 'Compliance Checker', desc: 'Verify your RFP meets all requirements' },
+            history: { title: 'Document History', desc: 'Track versions and modifications' },
+            security: { title: 'Security Status', desc: 'Monitor security compliance' },
+            audit: { title: 'Audit Trail', desc: 'Review system access logs' }
+        };
+        
+        if (headers[sectionName]) {
+            document.getElementById('pageTitle').textContent = headers[sectionName].title;
+            document.getElementById('pageDescription').textContent = headers[sectionName].desc;
         }
+        currentSection = sectionName;
+    }
 
-        // --- All other JavaScript functions (generateRFP, chat, etc.) remain unchanged ---
-        function generateRFP() {
-            showNotification('Generating Secure RFP...', 'info');
-            // ...
-        }
-        function sendChatMessage() {
-            // ...
-        }
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
-            setTimeout(() => { notification.classList.remove('show'); }, 3000);
-        }
+    function setAcquisitionType(type) {
+        currentAcquisitionType = type;
+        document.getElementById('acquisitionType').value = type;
         
-        document.addEventListener('DOMContentLoaded', () => {
-             // For demo purposes, hide auth overlay after a moment
-             // In a real app, this would be handled by a proper auth flow
-             if(window.location.hash !== '#auth') {
-                 // authenticateDemo(); // Uncomment to auto-login for testing
-             }
+        document.querySelectorAll('.sidebar .nav-item').forEach(item => {
+             if(item.getAttribute('onclick').includes('setAcquisitionType')) item.classList.remove('active');
+        });
+        document.querySelector(`.nav-item[onclick="setAcquisitionType('${type}')"]`).classList.add('active');
+        
+        showNotification(`Acquisition type set to ${type.toUpperCase()}`, 'info');
+    }
+
+    function toggleCompliance(item) {
+        complianceItems[item] = !complianceItems[item];
+        const checkbox = document.getElementById(item);
+        checkbox.classList.toggle('checked');
+        checkbox.textContent = complianceItems[item] ? '✓' : '';
+    }
+
+    // RFP Generation
+    function generateRFP() {
+        if (!isAuthenticated) { showNotification('Authentication required.', 'error'); return; }
+        const title = document.getElementById('projectTitle').value;
+        const objective = document.getElementById('missionObjective').value;
+        if (!title || !objective) {
+            showNotification('Please fill in project title and mission objective', 'error');
+            return;
+        }
+        showNotification('Generating RFP...', 'info');
+        setTimeout(() => {
+            const rfpContent = generateRFPContent(title, objective);
+            document.getElementById('rfpContent').innerHTML = rfpContent;
+            document.getElementById('rfpTitle').textContent = title.toUpperCase();
+            document.getElementById('rfpNumber').textContent = `RFP-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+            document.getElementById('rfpPreview').classList.remove('hidden');
+            showNotification('RFP generated successfully!', 'success');
+            updateLastSaved();
+        }, 2000);
+    }
+    
+    function generateRFPContent(title, objective) {
+        const acqType = document.getElementById('acquisitionType').value;
+        const secLevel = document.getElementById('securityLevel').value;
+        const acqTypeNames = { far: 'FAR-Based Contract', ota: 'Other Transaction Authority', cso: 'Commercial Solutions Opening', sbir: 'SBIR/STTR' };
+        
+        let complianceList = Object.keys(complianceItems).filter(key => complianceItems[key]).map(key => `<li>${key.toUpperCase()} Compliance Required</li>`).join('');
+
+        return `
+            <div class="rfp-section"><h3>1. INTRODUCTION</h3><p>The DoD solicits proposals for ${title}. This acquisition is under ${acqTypeNames[acqType]} authority with ${secLevel.toUpperCase()} security requirements.</p></div>
+            <div class="rfp-section"><h3>2. SCOPE OF WORK</h3><p>${objective}</p></div>
+            <div class="rfp-section"><h3>3. SECURITY REQUIREMENTS</h3><ul style="list-style-position: inside;">${complianceList}</ul></div>
+            <div class="rfp-section"><h3>4. EVALUATION CRITERIA</h3><p>Proposals will be evaluated on Technical Approach, Past Performance, and Cost.</p></div>
+        `;
+    }
+
+    // Template functions
+    function loadTemplate(templateType) {
+        const templates = {
+            cyber: { title: 'Advanced Cybersecurity Platform', objective: 'Develop and implement a comprehensive cybersecurity platform...', acqType: 'far', secLevel: 'secret'},
+            medical: { title: 'Medical Device Development Platform', objective: 'Design and develop innovative medical devices...', acqType: 'ota', secLevel: 'cui'},
+            aerospace: { title: 'Next-Generation Aerospace System', objective: 'Research, develop, and prototype advanced aerospace technologies...', acqType: 'ota', secLevel: 'secret'},
+            research: { title: 'Advanced R&D Initiative', objective: 'Conduct cutting-edge research in emerging technologies...', acqType: 'sbir', secLevel: 'cui'}
+        };
+        if (templates[templateType]) {
+            document.getElementById('projectTitle').value = templates[templateType].title;
+            document.getElementById('missionObjective').value = templates[templateType].objective;
+            document.getElementById('acquisitionType').value = templates[templateType].acqType;
+            document.getElementById('securityLevel').value = templates[templateType].secLevel;
+            showSection('generator');
+            setAcquisitionType(templates[templateType].acqType);
+            showNotification(`Template loaded: ${templates[templateType].title}`, 'success');
+        }
+    }
+
+    function saveTemplate() {
+        const title = document.getElementById('projectTitle').value;
+        if (!title) { showNotification('Please enter a project title to save.', 'error'); return; }
+        showNotification('Template saved successfully!', 'success');
+        updateLastSaved();
+    }
+
+    function clearForm() {
+        document.getElementById('projectTitle').value = '';
+        document.getElementById('missionObjective').value = '';
+        document.getElementById('rfpPreview').classList.add('hidden');
+        showNotification('Form cleared', 'info');
+    }
+
+    // Chat functions
+    function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.innerHTML += `<div class="message user"><strong>You:</strong> ${message}</div>`;
+        input.value = '';
+        setTimeout(() => {
+            messagesContainer.innerHTML += `<div class="message ai"><strong>AI:</strong> Acknowledged. According to DFARS 252.204-7012...</div>`;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }, 1000);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function handleChatKeyPress(event) {
+        if (event.key === 'Enter') sendChatMessage();
+    }
+
+    // Utility functions
+    function updateLastSaved() {
+        document.getElementById('lastSaved').textContent = new Date().toLocaleTimeString();
+    }
+    
+    function showNotification(message, type = 'info') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = `notification ${type} show`;
+        setTimeout(() => { notification.classList.remove('show'); }, 3000);
+    }
+    
+    // Page Initialization
+    function initializePage() {
+        showSection('dashboard');
+        setAcquisitionType('far');
+        document.querySelectorAll('.compliance-checkbox').forEach(el => {
+            const id = el.id;
+            if(complianceItems[id]){
+                el.classList.add('checked');
+                el.textContent = '✓';
+            }
         });
 
+        document.getElementById('placeOfPerformance').addEventListener('change', function() {
+            document.getElementById('customLocationGroup').style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+    }
+
+    // This waits for the page to load before running initialization logic.
+    document.addEventListener('DOMContentLoaded', function() {
+        // The page will be locked by the auth overlay until a user takes action.
+        // Initialization logic is called within the authentication functions.
+    });
     </script>
 </body>
 </html>
