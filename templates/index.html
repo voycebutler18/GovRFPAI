@@ -1058,6 +1058,7 @@
     
     // Authentication check on page load
     // Add this new function first
+// Add this function to handle authentication verification
 async function ensureAuthentication() {
     const storedUser = localStorage.getItem('govRfpUser');
     if (!storedUser) {
