@@ -603,7 +603,7 @@
     <script>
     // --- THIS IS THE COMPLETE, ORIGINAL JAVASCRIPT TO ENSURE ALL FUNCTIONS WORK ---
     
-    // State management
+    // Global variables
     let currentSection = 'generator';
     let currentAcquisitionType = 'far';
     let complianceItems = {
@@ -614,6 +614,7 @@
     };
     let isAuthenticated = false;
     let currentUser = null;
+    let currentRfpId = null; // Store current RFP ID for downloads
 
     // Authentication functions
     function authenticateCAC() {
@@ -701,37 +702,64 @@
         if (!isAuthenticated) { showNotification('Authentication required.', 'error'); return; }
         const title = document.getElementById('projectTitle').value;
         const objective = document.getElementById('missionObjective').value;
+        const acquisitionType = document.getElementById('acquisitionType').value;
+        const securityLevel = document.getElementById('securityLevel').value;
+        
         if (!title || !objective) {
             showNotification('Please fill in project title and mission objective', 'error');
             return;
         }
-        showNotification('Generating RFP...', 'info');
-        setTimeout(() => {
-            const rfpContent = generateRFPContent(title, objective);
-            document.getElementById('rfpContent').innerHTML = rfpContent;
-            document.getElementById('rfpTitle').textContent = title.toUpperCase();
-            document.getElementById('rfpNumber').textContent = `RFP-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-            document.getElementById('rfpPreview').classList.remove('hidden');
-            showNotification('RFP generated successfully!', 'success');
-            updateLastSaved();
-        }, 2000);
-    }
-    
-    function generateRFPContent(title, objective) {
-        const acqType = document.getElementById('acquisitionType').value;
-        const secLevel = document.getElementById('securityLevel').value;
-        const acqTypeNames = { far: 'FAR-Based Contract', ota: 'Other Transaction Authority', cso: 'Commercial Solutions Opening', sbir: 'SBIR/STTR' };
         
-        let complianceList = Object.keys(complianceItems).filter(key => complianceItems[key]).map(key => `<li>${key.toUpperCase()} Compliance Required</li>`).join('');
-
-        return `
-            <div class="rfp-section"><h3>1. INTRODUCTION</h3><p>The DoD solicits proposals for ${title}. This acquisition is under ${acqTypeNames[acqType]} authority with ${secLevel.toUpperCase()} security requirements.</p></div>
-            <div class="rfp-section"><h3>2. SCOPE OF WORK</h3><p>${objective}</p></div>
-            <div class="rfp-section"><h3>3. SECURITY REQUIREMENTS</h3><ul style="list-style-position: inside;">${complianceList}</ul></div>
-            <div class="rfp-section"><h3>4. EVALUATION CRITERIA</h3><p>Proposals will be evaluated on Technical Approach, Past Performance, and Cost.</p></div>
-        `;
+        showNotification('Generating detailed RFP using AI...', 'info');
+        
+        // Collect compliance requirements
+        const complianceRequirements = Object.keys(complianceItems).filter(key => complianceItems[key]);
+        
+        // Prepare data for API call
+        const rfpData = {
+            project_title: title,
+            mission_objective: objective,
+            acquisition_type: acquisitionType,
+            security_level: securityLevel,
+            compliance_requirements: complianceRequirements,
+            place_of_performance: document.getElementById('placeOfPerformance').value,
+            contract_value: 'simplified' // You can add this field to the form if needed
+        };
+        
+        // Call the OpenAI-powered API endpoint
+        fetch('/api/rfp/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rfpData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Display the AI-generated content
+                document.getElementById('rfpContent').innerHTML = data.content;
+                document.getElementById('rfpTitle').textContent = title.toUpperCase();
+                document.getElementById('rfpNumber').textContent = data.rfp_number;
+                document.getElementById('rfpPreview').classList.remove('hidden');
+                
+                // Store RFP ID for later use (downloads, etc.)
+                currentRfpId = data.rfp_id;
+                
+                showNotification('Detailed RFP generated successfully using AI!', 'success');
+                updateLastSaved();
+                
+                // Add download button
+                addDownloadButton();
+            } else {
+                showNotification(`Error generating RFP: ${data.error}`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Failed to generate RFP. Please try again.', 'error');
+        });
     }
-
     // Template functions
     function loadTemplate(templateType) {
         const templates = {
@@ -805,7 +833,83 @@
         }, 1500);
     }
 
-    // Demo mode exit
+    // Download functionality
+    function addDownloadButton() {
+        // Remove existing download button if present
+        const existingBtn = document.getElementById('downloadBtn');
+        if (existingBtn) existingBtn.remove();
+        
+        // Add download button after the RFP preview
+        const rfpPreview = document.getElementById('rfpPreview');
+        const downloadBtn = document.createElement('button');
+        downloadBtn.id = 'downloadBtn';
+        downloadBtn.className = 'btn btn-primary';
+        downloadBtn.style.marginTop = '16px';
+        downloadBtn.innerHTML = '📄 Download RFP Document';
+        downloadBtn.onclick = downloadRFP;
+        
+        rfpPreview.appendChild(downloadBtn);
+    }
+    
+    function downloadRFP() {
+        if (!currentRfpId) {
+            showNotification('No RFP to download', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('rfpTitle').textContent;
+        const number = document.getElementById('rfpNumber').textContent;
+        const content = document.getElementById('rfpContent').innerHTML;
+        
+        // Create a more professional document format
+        const documentHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${title} - ${number}</title>
+                <style>
+                    body { font-family: 'Times New Roman', serif; margin: 40px; line-height: 1.6; color: #000; }
+                    .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+                    .title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+                    .number { font-size: 18px; color: #666; }
+                    h3 { color: #000; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 30px; }
+                    p { margin-bottom: 15px; text-align: justify; }
+                    ul { margin-left: 20px; }
+                    li { margin-bottom: 8px; }
+                    .footer { margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px; text-align: center; font-size: 12px; color: #666; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="title">${title}</div>
+                    <div class="number">${number}</div>
+                    <div style="margin-top: 10px; font-size: 14px;">Department of Defense</div>
+                    <div style="font-size: 14px;">Request for Proposal</div>
+                </div>
+                <div class="content">
+                    ${content}
+                </div>
+                <div class="footer">
+                    <p>Generated by GovRFP AI • ${new Date().toLocaleDateString()}</p>
+                    <p>🇺🇸 Department of Defense • Controlled Unclassified Information</p>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        // Create and download the file
+        const blob = new Blob([documentHTML], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${number.replace(/[^a-zA-Z0-9]/g, '_')}_${title.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showNotification('RFP document downloaded successfully!', 'success');
+    }
     function exitDemoMode() {
         if (confirm('Are you sure you want to exit demo mode? You will need to re-authenticate.')) {
             isAuthenticated = false;
@@ -848,7 +952,35 @@
         setTimeout(() => { notification.classList.remove('show'); }, 3000);
     }
     
-    // Page Initialization
+    // Authentication check on page load
+    function checkAuthentication() {
+        // Check if user is authenticated via localStorage (from login page)
+        const storedUser = localStorage.getItem('govRfpUser');
+        if (storedUser) {
+            try {
+                currentUser = JSON.parse(storedUser);
+                isAuthenticated = true;
+                document.getElementById('currentUserEmail').textContent = currentUser.email;
+                
+                // Show exit demo button if demo user
+                if (currentUser.role === 'demo') {
+                    document.getElementById('exitDemoBtn').style.display = 'inline-flex';
+                }
+                
+                // Hide auth overlay
+                document.getElementById('authOverlay').style.display = 'none';
+                
+                showNotification(`Welcome, ${currentUser.name}!`, 'success');
+                initializePage();
+                return;
+            } catch (e) {
+                console.error('Error parsing stored user:', e);
+            }
+        }
+        
+        // If no valid authentication, show auth overlay
+        document.getElementById('authOverlay').style.display = 'flex';
+    }
     function initializePage() {
         showSection('dashboard');
         setAcquisitionType('far');
@@ -867,8 +999,8 @@
 
     // This waits for the page to load before running initialization logic.
     document.addEventListener('DOMContentLoaded', function() {
-        // The page will be locked by the auth overlay until a user takes action.
-        // Initialization logic is called within the authentication functions.
+        // Check for existing authentication first
+        checkAuthentication();
     });
     </script>
 </body>
