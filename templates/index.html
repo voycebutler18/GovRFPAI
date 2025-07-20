@@ -676,15 +676,14 @@
         
         console.log("Sending data to API:", rfpData);
         
-        // Call the OpenAI-powered API endpoint with authentication
+        // Call the OpenAI-powered API endpoint with session-based auth
         fetch('/api/rfp/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + getAuthToken(),
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            credentials: 'include', // Include cookies for session-based auth
+            credentials: 'same-origin', // Include session cookies
             body: JSON.stringify(rfpData)
         })
         .then(response => {
@@ -729,8 +728,11 @@
             generateBtn.innerHTML = '✨ Generate RFP';
             
             // Check if it's an authentication error
-            if (error.message && error.message.includes('Authentication')) {
-                showNotification('Session expired. Please refresh the page and login again.', 'error');
+            if (error.status === 401) {
+                showNotification('Session expired. Please refresh the page to re-authenticate.', 'error');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             } else {
                 showNotification('Failed to generate RFP. Please try again.', 'error');
             }
@@ -1012,32 +1014,6 @@
     }
 
     // Utility functions
-    function getAuthToken() {
-        // Try to get token from localStorage first
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            return token;
-        }
-        
-        // If no token, try to get from session storage
-        const sessionToken = sessionStorage.getItem('authToken');
-        if (sessionToken) {
-            return sessionToken;
-        }
-        
-        // If no token found, try to get from cookies
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split('=');
-            if (name === 'authToken' || name === 'sessionToken') {
-                return value;
-            }
-        }
-        
-        // Return empty string if no token found
-        return '';
-    }
-
     function updateLastSaved() {
         document.getElementById('lastSaved').textContent = new Date().toLocaleTimeString();
     }
@@ -1065,12 +1041,52 @@
         });
     }
 
-    // Initialize the application since user is already authenticated
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set default user info since they're already logged in
-        document.getElementById('currentUserEmail').textContent = 'authenticated.user@defense.gov';
-        showNotification('Welcome to GovRFP AI Platform!', 'success');
-        initializePage();
+    // Initialize the application and establish Flask session
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            // First check if we already have a valid session
+            const authResponse = await fetch('/api/auth/status', {
+                method: 'GET',
+                credentials: 'same-origin'
+            });
+            
+            const authData = await authResponse.json();
+            
+            if (authData.authenticated) {
+                // User already has a valid Flask session
+                document.getElementById('currentUserEmail').textContent = authData.user.email;
+                showNotification(`Welcome back, ${authData.user.name}!`, 'success');
+                initializePage();
+            } else {
+                // No valid session, create one for the authenticated user
+                const verifyResponse = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        email: 'authenticated.user@defense.gov',
+                        name: 'Authenticated User',
+                        authMethod: 'login',
+                        role: 'Contracting Officer'
+                    })
+                });
+                
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyData.success) {
+                    document.getElementById('currentUserEmail').textContent = verifyData.user.email;
+                    showNotification(`Welcome, ${verifyData.user.name}!`, 'success');
+                    initializePage();
+                } else {
+                    showNotification('Session initialization failed. Please refresh the page.', 'error');
+                }
+            }
+        } catch (error) {
+            console.error('Authentication setup error:', error);
+            showNotification('Authentication setup failed. Please refresh the page.', 'error');
+        }
     });
     </script>
 </body>
