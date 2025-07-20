@@ -453,18 +453,6 @@ def generate_rfp_content_with_openai(data):
         error_msg = f"OpenAI API Call Failed: {str(e)}"
         print(f"=== ERROR ===: {error_msg}")
         return f"<h3>Error: AI Content Generation Failed</h3><p>The connection to the OpenAI service failed. Please check the server logs for details.</p><p><strong>Error Details:</strong> {e}</p>"
-                {"role": "system", "content": "You are a professional DoD contracting officer assistant that generates comprehensive RFP documents."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        print("=== OpenAI API Call Successful ===")
-        result = response.choices[0].message.content
-        print(f"Generated content length: {len(result)} characters")
-        return result
-    except Exception as e:
-        error_msg = f"OpenAI API Call Failed: {str(e)}"
-        print(f"=== ERROR ===: {error_msg}")
-        return f"<h3>Error: AI Content Generation Failed</h3><p>The connection to the OpenAI service failed. Please check the server logs for details.</p><p><strong>Error Details:</strong> {e}</p>"
 
 # ===== TEMPLATE ROUTES =====
 @app.route('/api/templates/<template_id>', methods=['GET'])
