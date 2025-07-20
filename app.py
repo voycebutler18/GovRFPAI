@@ -130,7 +130,7 @@ def login_page():
 @app.route('/app')
 def main_app():
     """Main RFP application (requires authentication)"""
-    return render_template('app.html')
+    return render_template('index.html')  # Change from 'app.html' to 'index.html'
 
 @app.route('/signup')
 def signup_page():
