@@ -333,58 +333,6 @@ def generate_rfp_content_with_openai(data):
         # Provide a useful error message to the front-end if the API call fails.
         return f"<h3>Error: AI Content Generation Failed</h3><p>The connection to the OpenAI service failed. Please check the server logs for details.</p><p><strong>Error Details:</strong> {e}</p>"
 
-@app.route('/', methods=['POST'])
-def generate():
-    title = request.form.get('title')
-    objective = request.form.get('objective')
-    acquisition_type = request.form.get('acquisition_type')
-    classification = request.form.get('classification')
-    contract_range = request.form.get('contract_range')
-    due_date = request.form.get('due_date')
-    duration = request.form.get('duration')
-    location = request.form.get('location')
-
-    rfp = f"""
-SECURE LOGISTICS AI PLATFORM FOR JOINT BASE OPERATIONS
-RFP-2025-503
-1. INTRODUCTION
-The Department of Defense hereby solicits proposals for {title}. This acquisition will be conducted under {acquisition_type} authority with {classification} security classification requirements.
-
-2. SCOPE OF WORK
-{objective}
-
-3. TECHNICAL REQUIREMENTS
-All deliverables must meet the following technical specifications:
-- Compliance with relevant DoD and federal standards
-- Integration with existing government systems
-- Scalability for future requirements
-- Comprehensive documentation and training materials
-
-4. SECURITY REQUIREMENTS
-This contract requires {classification} security clearance. The following security standards apply:
-- NIST 800-171 Controlled Unclassified Information (CUI) protection
-- Cybersecurity Maturity Model Certification (CMMC) requirements
-- Federal Information Security Management Act (FISMA) compliance
-- Defense Federal Acquisition Regulation Supplement (DFARS) clauses
-
-5. EVALUATION CRITERIA
-Proposals will be evaluated based on the following criteria:
-- Technical Approach (40%)
-- Management Approach (25%)
-- Past Performance (20%)
-- Cost/Price (15%)
-
-6. SUBMISSION REQUIREMENTS
-Proposals must be submitted electronically through the designated secure portal no later than {due_date}. Late submissions will not be considered.
-
-7. CONTRACT INFORMATION
-Contract Type: {acquisition_type}
-Estimated Value: {contract_range}
-Period of Performance: {duration}
-Place of Performance: {location}
-"""
-    return render_template('index gov.html', rfp=rfp)
-
 @app.route('/api/templates/<template_id>', methods=['GET'])
 @login_required
 def get_template(template_id):
