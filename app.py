@@ -6,6 +6,7 @@ import json
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
+import openai
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)  # Generate a secure secret key
