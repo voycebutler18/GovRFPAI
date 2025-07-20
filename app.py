@@ -340,7 +340,7 @@ def generate_rfp():
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 def generate_rfp_content_with_openai(data):
-    """Generate RFP content using OpenAI API"""
+    """Generate comprehensive RFP content using OpenAI API"""
     print(f"=== OpenAI Generation Started ===")
     print(f"Input data: {data}")
     
@@ -357,37 +357,102 @@ def generate_rfp_content_with_openai(data):
         items = [COMPLIANCE_STANDARDS.get(req, req) for req in data['compliance_requirements']]
         compliance_text = "\n".join([f"- {item}" for item in items])
 
+    # Enhanced prompt for complete, detailed RFP
     prompt = f"""
-    Act as a professional Department of Defense (DoD) contracting officer. Your task is to generate a comprehensive, detailed Request for Proposal (RFP) document.
-    The document must be formal, well-structured, and use appropriate language for government contracting.
-    
-    Project Information:
-    - Project Title: {data['project_title']}
-    - Acquisition Authority: {acq_type_name}
-    - Security Classification: {security_name}
-    - Statement of Work: {data['mission_objective']}
-    - Compliance Requirements: {compliance_text}
-    
-    Generate a complete RFP with these sections:
-    
-    1. INTRODUCTION - Include background, purpose, and acquisition authority
-    2. SCOPE OF WORK - Detailed requirements, deliverables, and performance standards
-    3. TECHNICAL REQUIREMENTS - Specific technical specifications, standards, and testing requirements
-    4. SECURITY REQUIREMENTS - Security clearances, compliance standards, and protection requirements
-    5. EVALUATION CRITERIA - Detailed scoring methodology with weights (Technical 40%, Past Performance 25%, Management 20%, Cost 15%)
-    6. SUBMISSION REQUIREMENTS - Proposal format, page limits, and submission instructions
-    7. CONTRACT INFORMATION - Contract type, period of performance, and key terms
-    8. INSTRUCTIONS TO OFFERORS - Detailed submission process and requirements
-    
-    Make each section comprehensive with specific details. Use professional government contracting language.
-    Format output as HTML using <h3>, <p>, <ul>, and <li> tags. Make it detailed and substantial - at least 1500 words total.
+    You are a senior Department of Defense contracting officer. Generate a COMPLETE, comprehensive Request for Proposal (RFP) document that meets DoD standards. This must be a full, detailed document - not a summary.
+
+    PROJECT DETAILS:
+    - Title: {data['project_title']}
+    - Acquisition: {acq_type_name}
+    - Classification: {security_name}
+    - Objective: {data['mission_objective']}
+    - Compliance: {compliance_text}
+
+    Generate a COMPLETE RFP with ALL sections fully detailed. Each section must be comprehensive and professional:
+
+    1. INTRODUCTION (2-3 paragraphs)
+    - Background and purpose
+    - Acquisition authority and justification
+    - Program overview and strategic importance
+
+    2. SCOPE OF WORK (4-5 paragraphs)
+    - Detailed requirements breakdown
+    - Performance objectives and metrics
+    - Deliverables and milestones
+    - Technical specifications
+
+    3. TECHNICAL REQUIREMENTS (5-6 paragraphs)
+    - Detailed technical specifications
+    - Performance standards and benchmarks
+    - Integration requirements
+    - Testing and validation criteria
+    - Quality assurance standards
+
+    4. SECURITY REQUIREMENTS (3-4 paragraphs)
+    - Security clearance requirements
+    - Compliance framework details
+    - Data protection and handling
+    - Facility security requirements
+
+    5. EVALUATION CRITERIA (4-5 paragraphs)
+    - Technical approach evaluation (40%)
+    - Past performance assessment (25%)
+    - Management approach (20%)
+    - Cost evaluation (15%)
+    - Detailed scoring methodology
+
+    6. SUBMISSION REQUIREMENTS (3-4 paragraphs)
+    - Proposal format and structure
+    - Required documentation
+    - Submission process and deadlines
+    - Mandatory proposal elements
+
+    7. CONTRACT INFORMATION (3-4 paragraphs)
+    - Contract type and structure
+    - Period of performance
+    - Payment terms and schedule
+    - Key contract clauses
+
+    8. INSTRUCTIONS TO OFFERORS (3-4 paragraphs)
+    - Pre-proposal conference details
+    - Question and answer process
+    - Proposal preparation guidelines
+    - Contact information
+
+    9. STATEMENT OF WORK DETAILS (4-5 paragraphs)
+    - Phase-by-phase work breakdown
+    - Specific tasks and subtasks
+    - Government-furnished equipment/information
+    - Contractor responsibilities
+
+    10. TERMS AND CONDITIONS (3-4 paragraphs)
+    - Standard FAR clauses
+    - DFARS provisions
+    - Special contract requirements
+    - Intellectual property considerations
+
+    IMPORTANT: Generate the COMPLETE document with ALL sections fully written out. Do not use placeholders or summaries. Each section must be detailed and comprehensive. Format as clean HTML using <h3> for section headers and <p> for paragraphs. Use <ul><li> for lists. Make this a complete 3000+ word professional RFP document.
     """
 
     try:
-        print("=== Calling OpenAI API ===")
+        print("=== Calling OpenAI API for Complete RFP ===")
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
+                {"role": "system", "content": "You are a senior DoD contracting officer who generates comprehensive, complete RFP documents. Always provide full, detailed content - never summaries or placeholders."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=4000,  # Increased token limit for longer content
+            temperature=0.3   # Lower temperature for more consistent, professional output
+        )
+        print("=== OpenAI API Call Successful ===")
+        result = response.choices[0].message.content
+        print(f"Generated content length: {len(result)} characters")
+        return result
+    except Exception as e:
+        error_msg = f"OpenAI API Call Failed: {str(e)}"
+        print(f"=== ERROR ===: {error_msg}")
+        return f"<h3>Error: AI Content Generation Failed</h3><p>The connection to the OpenAI service failed. Please check the server logs for details.</p><p><strong>Error Details:</strong> {e}</p>"
                 {"role": "system", "content": "You are a professional DoD contracting officer assistant that generates comprehensive RFP documents."},
                 {"role": "user", "content": prompt}
             ]
