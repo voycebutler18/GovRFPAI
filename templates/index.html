@@ -699,62 +699,103 @@
 
     // RFP Generation
     function generateRFP() {
-        if (!isAuthenticated) { showNotification('Authentication required.', 'error'); return; }
-        const title = document.getElementById('projectTitle').value;
-        const objective = document.getElementById('missionObjective').value;
-        const acquisitionType = document.getElementById('acquisitionType').value;
-        const securityLevel = document.getElementById('securityLevel').value;
+    console.log("=== Generate RFP Button Clicked ===");
+    
+    if (!isAuthenticated) { 
+        showNotification('Authentication required.', 'error'); 
+        console.log("ERROR: Not authenticated");
+        return; 
+    }
+    
+    const title = document.getElementById('projectTitle').value;
+    const objective = document.getElementById('missionObjective').value;
+    const acquisitionType = document.getElementById('acquisitionType').value;
+    const securityLevel = document.getElementById('securityLevel').value;
+    
+    console.log("Form data:", { title, objective, acquisitionType, securityLevel });
+    
+    if (!title || !objective) {
+        showNotification('Please fill in project title and mission objective', 'error');
+        console.log("ERROR: Missing required fields");
+        return;
+    }
+    
+    // Disable the button to prevent multiple clicks
+    const generateBtn = document.querySelector('button[onclick="generateRFP()"]');
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '⏳ Generating...';
+    
+    showNotification('Generating detailed RFP using AI...', 'info');
+    console.log("=== Starting API call ===");
+    
+    // Collect compliance requirements
+    const complianceRequirements = Object.keys(complianceItems).filter(key => complianceItems[key]);
+    
+    // Prepare data for API call
+    const rfpData = {
+        project_title: title,
+        mission_objective: objective,
+        acquisition_type: acquisitionType,
+        security_level: securityLevel,
+        compliance_requirements: complianceRequirements,
+        place_of_performance: document.getElementById('placeOfPerformance').value,
+        contract_value: 'simplified'
+    };
+    
+    console.log("Sending data to API:", rfpData);
+    
+    // Call the OpenAI-powered API endpoint
+    fetch('/api/rfp/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(rfpData)
+    })
+    .then(response => {
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+        return response.json();
+    })
+    .then(data => {
+        console.log("Response data:", data);
         
-        if (!title || !objective) {
-            showNotification('Please fill in project title and mission objective', 'error');
-            return;
+        // Re-enable the button
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '✨ Generate RFP';
+        
+        if (data.success) {
+            console.log("=== RFP Generation Successful ===");
+            // Display the AI-generated content
+            document.getElementById('rfpContent').innerHTML = data.content;
+            document.getElementById('rfpTitle').textContent = title.toUpperCase();
+            document.getElementById('rfpNumber').textContent = data.rfp_number;
+            document.getElementById('rfpPreview').classList.remove('hidden');
+            
+            // Store RFP ID for later use (downloads, etc.)
+            currentRfpId = data.rfp_id;
+            
+            showNotification('Detailed RFP generated successfully using AI!', 'success');
+            updateLastSaved();
+            
+            // Add download button
+            addDownloadButton();
+        } else {
+            console.log("=== RFP Generation Failed ===");
+            console.error("Error from API:", data.error);
+            showNotification(`Error generating RFP: ${data.error}`, 'error');
         }
+    })
+    .catch(error => {
+        console.error('=== Fetch Error ===:', error);
         
-        showNotification('Generating detailed RFP using AI...', 'info');
+        // Re-enable the button
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '✨ Generate RFP';
         
-        // Collect compliance requirements
-        const complianceRequirements = Object.keys(complianceItems).filter(key => complianceItems[key]);
-        
-        // Prepare data for API call
-        const rfpData = {
-            project_title: title,
-            mission_objective: objective,
-            acquisition_type: acquisitionType,
-            security_level: securityLevel,
-            compliance_requirements: complianceRequirements,
-            place_of_performance: document.getElementById('placeOfPerformance').value,
-            contract_value: 'simplified' // You can add this field to the form if needed
-        };
-        
-        // Call the OpenAI-powered API endpoint
-        fetch('/api/rfp/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(rfpData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Display the AI-generated content
-                document.getElementById('rfpContent').innerHTML = data.content;
-                document.getElementById('rfpTitle').textContent = title.toUpperCase();
-                document.getElementById('rfpNumber').textContent = data.rfp_number;
-                document.getElementById('rfpPreview').classList.remove('hidden');
-                
-                // Store RFP ID for later use (downloads, etc.)
-                currentRfpId = data.rfp_id;
-                
-                showNotification('Detailed RFP generated successfully using AI!', 'success');
-                updateLastSaved();
-                
-                // Add download button
-                addDownloadButton();
-            } else {
-                showNotification(`Error generating RFP: ${data.error}`, 'error');
-            }
-        })
+        showNotification('Failed to generate RFP. Please try again.', 'error');
+    });
+}
         .catch(error => {
             console.error('Error:', error);
             showNotification('Failed to generate RFP. Please try again.', 'error');
