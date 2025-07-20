@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Email Authentication - GovRFP AI</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #111827;
+            --bg-medium: #1F2937;
+            --bg-light: #374151;
+            --border-color: #4B5563;
+            --text-primary: #F9FAFB;
+            --text-secondary: #D1D5DB;
+            --text-muted: #9CA3AF;
+            --accent-blue: #3B82F6;
+            --accent-red: #EF4444;
+            --accent-green: #10B981;
+            --font-primary: 'Roboto', sans-serif;
+            --font-display: 'Orbitron', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-container {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .auth-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--accent-red);
+        }
+
+        .error-message {
+            color: var(--accent-red);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--accent-green);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #60A5FA;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            background: rgba(31, 41, 55, 0.95);
+            padding: 0 16px;
+        }
+
+        .security-notice {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .security-notice .notice-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .approved-domains {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .approved-domains strong {
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .back-link a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .back-link a:hover {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo">🛡️ GovRFP AI</div>
+            <div class="auth-subtitle">Department of Defense Contracting Platform</div>
+            <h1 class="auth-title">Secure Email Authentication</h1>
+            <p class="auth-description">Sign in using your government or authorized contractor email address.</p>
+        </div>
+
+        <div class="security-notice">
+            <div class="notice-title">
+                🔒 Security Notice
+            </div>
+            <p>This system is for authorized personnel only. All activities are monitored and logged for security purposes.</p>
+            <div class="approved-domains">
+                <strong>Approved Domains:</strong> .gov, .mil, .navy.mil, .army.mil, .af.mil, .uscg.mil, authorized contractors
+            </div>
+        </div>
+
+        <form id="emailAuthForm">
+            <div class="form-group">
+                <label for="email" class="form-label">Government Email Address</label>
+                <input type="email" id="email" name="email" class="form-input" 
+                       placeholder="user@agency.gov" required>
+                <div class="error-message" id="emailError"></div>
+                <div class="success-message" id="emailSuccess"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-input" 
+                       placeholder="Enter your secure password" required>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+                <span id="loginText">🔐 Secure Login</span>
+                <div class="loading" id="loadingSpinner"></div>
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <button type="button" class="btn btn-secondary" onclick="goToCAC()">
+            🏛️ Use CAC/PIV Authentication
+        </button>
+
+        <button type="button" class="btn btn-secondary" onclick="goToDemo()">
+            🚀 Continue with Demo Mode
+        </button>
+
+        <div class="back-link">
+            <a href="/">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const approvedDomains = [
+            '.gov', '.mil', '.navy.mil', '.army.mil', '.af.mil', '.uscg.mil',
+            '.dod.gov', '.defense.gov', '.pentagon.mil'
+        ];
+
+        const ownerEmail = 'peterbutler41@gmail.com';
+        const ownerPassword = 'Bruton20!';
+
+        document.getElementById('emailAuthForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            // Clear previous errors
+            clearErrors();
+            
+            // Validate email format
+            if (!isValidEmail(email)) {
+                showError('emailError', 'Please enter a valid email address');
+                return;
+            }
+            
+            // Check if it's the owner login
+            if (email === ownerEmail && password === ownerPassword) {
+                // Owner login - always allowed
+                authenticateUser(email, 'Owner', 'owner');
+                return;
+            }
+            
+            // Check approved domains
+            if (!isApprovedDomain(email)) {
+                showError('emailError', 'This email domain is not authorized. Only .gov, .mil, and approved contractor domains are allowed.');
+                return;
+            }
+            
+            // Validate password
+            if (password.length < 8) {
+                showError('passwordError', 'Password must be at least 8 characters long');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loginText.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+            
+            // Simulate authentication process
+            setTimeout(() => {
+                // In a real system, this would make an API call to verify credentials
+                // For demo purposes, we'll accept any valid government email with a password
+                authenticateUser(email, extractNameFromEmail(email), 'government');
+            }, 2000);
+        });
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function isApprovedDomain(email) {
+            // Always allow owner email
+            if (email === ownerEmail) return true;
+            
+            const domain = email.substring(email.lastIndexOf('@'));
+            return approvedDomains.some(approvedDomain => 
+                domain.endsWith(approvedDomain)
+            );
+        }
+        
+        function extractNameFromEmail(email) {
+            const username = email.split('@')[0];
+            const parts = username.split('.');
+            return parts.map(part => 
+                part.charAt(0).toUpperCase() + part.slice(1)
+            ).join(' ');
+        }
+        
+        function authenticateUser(email, name, role) {
+            // Store user data
+            const userData = {
+                email: email,
+                name: name,
+                role: role,
+                authMethod: 'email',
+                loginTime: new Date().toISOString()
+            };
+            
+            // Store in localStorage for the main app to access
+            localStorage.setItem('govRfpUser', JSON.stringify(userData));
+            
+            // Show success message
+            showSuccess('emailSuccess', 'Authentication successful! Redirecting...');
+            
+            // Redirect to main application
+            setTimeout(() => {
+                window.location.href = '/app';
+            }, 1500);
+        }
+        
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            const inputElement = elementId.includes('email') ? 
+                document.getElementById('email') : document.getElementById('password');
+            
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            inputElement.classList.add('error');
+        }
+        
+        function showSuccess(elementId, message) {
+            const successElement = document.getElementById(elementId);
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+        }
+        
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            const inputElements = document.querySelectorAll('.form-input');
+            const successElements = document.querySelectorAll('.success-message');
+            
+            errorElements.forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+            
+            successElements.forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+            
+            inputElements.forEach(el => {
+                el.classList.remove('error');
+            });
+        }
+        
+        function goToCAC() {
+            // Redirect to CAC authentication page
+            window.location.href = '/auth/cac';
+        }
+        
+        function goToDemo() {
+            // Set demo user data
+            const demoUser = {
+                email: 'demo@defense.gov',
+                name: 'Demo User',
+                role: 'demo',
+                authMethod: 'demo',
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('govRfpUser', JSON.stringify(demoUser));
+            window.location.href = '/app';
+        }
+    </script>
+</body>
+</html>
