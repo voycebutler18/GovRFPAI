@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from datetime import datetime, timedelta
 from functools import wraps
+from openai import OpenAI
 import secrets
 import json
 import os
