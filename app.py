@@ -122,11 +122,6 @@ def home():
     """Landing page - home.html"""
     return render_template('home.html')
 
-@app.route('/')
-def home():
-    """Landing page - home.html"""
-    return render_template('home.html')
-
 @app.route('/login')
 def login_page():
     """Email authentication page"""
