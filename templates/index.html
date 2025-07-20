@@ -676,12 +676,15 @@
         
         console.log("Sending data to API:", rfpData);
         
-        // Call the OpenAI-powered API endpoint
+        // Call the OpenAI-powered API endpoint with authentication
         fetch('/api/rfp/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + getAuthToken(),
+                'X-Requested-With': 'XMLHttpRequest'
             },
+            credentials: 'include', // Include cookies for session-based auth
             body: JSON.stringify(rfpData)
         })
         .then(response => {
@@ -725,7 +728,12 @@
             generateBtn.disabled = false;
             generateBtn.innerHTML = '✨ Generate RFP';
             
-            showNotification('Failed to generate RFP. Please try again.', 'error');
+            // Check if it's an authentication error
+            if (error.message && error.message.includes('Authentication')) {
+                showNotification('Session expired. Please refresh the page and login again.', 'error');
+            } else {
+                showNotification('Failed to generate RFP. Please try again.', 'error');
+            }
         });
     }
 
@@ -1004,6 +1012,32 @@
     }
 
     // Utility functions
+    function getAuthToken() {
+        // Try to get token from localStorage first
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            return token;
+        }
+        
+        // If no token, try to get from session storage
+        const sessionToken = sessionStorage.getItem('authToken');
+        if (sessionToken) {
+            return sessionToken;
+        }
+        
+        // If no token found, try to get from cookies
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'authToken' || name === 'sessionToken') {
+                return value;
+            }
+        }
+        
+        // Return empty string if no token found
+        return '';
+    }
+
     function updateLastSaved() {
         document.getElementById('lastSaved').textContent = new Date().toLocaleTimeString();
     }
