@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovRFP AI - Defense Contracting Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #111827;
+            --bg-medium: #1F2937;
+            --bg-light: #374151;
+            --border-color: #4B5563;
+            --text-primary: #F9FAFB;
+            --text-secondary: #D1D5DB;
+            --text-muted: #9CA3AF;
+            --accent-gold: #F59E0B;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            --accent-blue: #3B82F6;
+            --font-primary: 'Roboto', sans-serif;
+            --font-display: 'Orbitron', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #60A5FA;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .hero {
+            padding: 120px 24px 80px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .features {
+            padding: 80px 24px;
+            background: rgba(31, 41, 55, 0.5);
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            font-family: var(--font-display);
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 48px;
+            color: var(--text-primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: rgba(55, 65, 81, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .security-badges {
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .security-badges h2 {
+            font-family: var(--font-display);
+            font-size: 32px;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+        }
+
+        .badges-grid {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .cta-section {
+            padding: 80px 24px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1E40AF 100%);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-family: var(--font-display);
+            font-size: 36px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 32px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .footer {
+            background: var(--bg-dark);
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .nav-links {
+                gap: 16px;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">🛡️ GovRFP AI</a>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#security" class="nav-link">Security</a>
+                <a href="/login" class="btn btn-secondary">Login</a>
+                <a href="/signup" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>AI-Powered Defense Contracting</h1>
+        <p>Streamline your DoD and Federal Government RFP process with secure, compliant, AI-driven contract generation. Built specifically for defense contractors and government acquisition professionals.</p>
+        <div class="hero-cta">
+            <a href="/signup" class="btn btn-primary">🚀 Start Free Trial</a>
+            <a href="/login" class="btn btn-secondary">🔐 Secure Login</a>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="features-container">
+            <h2>Purpose-Built for Defense Contracting</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">✨</span>
+                    <h3>AI-Powered RFP Generation</h3>
+                    <p>Generate comprehensive, compliant RFPs in minutes using advanced AI trained on DoD regulations and best practices.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🛡️</span>
+                    <h3>Security & Compliance</h3>
+                    <p>Built-in NIST 800-171, CMMC, FISMA, and DFARS compliance checking ensures your contracts meet all security requirements.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📋</span>
+                    <h3>Multiple Contract Types</h3>
+                    <p>Support for FAR contracts, OTAs, CSOs, and SBIR/STTR with specialized templates for each acquisition type.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔍</span>
+                    <h3>Automated Compliance Review</h3>
+                    <p>Real-time compliance checking against federal regulations with detailed recommendations and corrections.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📚</span>
+                    <h3>Template Library</h3>
+                    <p>Extensive library of pre-approved templates for cybersecurity, aerospace, medical devices, and R&D contracts.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>Audit Trail & Tracking</h3>
+                    <p>Complete audit trail for compliance requirements with version control and approval workflows.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="security-badges" id="security">
+        <h2>Trusted by Defense Professionals</h2>
+        <div class="badges-grid">
+            <div class="badge">🔒 FedRAMP Authorized</div>
+            <div class="badge">✅ CMMC Level 3</div>
+            <div class="badge">🛡️ NIST 800-171</div>
+            <div class="badge">📋 FISMA Compliant</div>
+            <div class="badge">⚡ ATO Certified</div>
+            <div class="badge">🔐 CAC/PIV Ready</div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Ready to Transform Your Contracting Process?</h2>
+        <p>Join defense contractors and government agencies already using GovRFP AI to streamline their acquisition process.</p>
+        <a href="/signup" class="btn btn-primary" style="background: white; color: var(--accent-blue); font-size: 18px; padding: 16px 32px;">🚀 Get Started Today</a>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2025 GovRFP AI. Built for the U.S. Department of Defense and Federal Agencies.</p>
+        <p>🇺🇸 Proudly serving those who serve our nation.</p>
+    </footer>
+</body>
+</html>
